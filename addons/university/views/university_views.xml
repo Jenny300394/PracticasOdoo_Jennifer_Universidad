@@ -415,11 +415,15 @@
                     <field name="image_1920" widget="image" class="oe_avatar"/>
                 </div>
                 <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
                     <h1><field name="name" placeholder="Student Name"/></h1>
                 </div>
                 <group>
                     <group>
-                        <field name="email" placeholder="email@example.com"/> <field name="university_id"/>
+                        <field name="partner_id" string="Related Contact" placeholder="Select the user contact..."/>
+                        
+                        <field name="email" placeholder="email@example.com"/> 
+                        <field name="university_id"/>
                         <field name="tutor_id"/>
                     </group>
                 </group>

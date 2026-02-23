@@ -1,0 +1,45 @@
+<odoo>
+    <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Grades</t>
+                <t t-set="url" t-value="'/my/grades'"/>
+                <t t-set="placeholder_count" t-value="'grade_count'"/>
+                <t t-set="count" t-value="grade_count"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_grades_template" name="My Grades">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-3">
+                <h3>My Academic Grades</h3>
+                <t t-if="not grades">
+                    <div class="alert alert-info">No grades found for your student profile.</div>
+                </t>
+                <table t-if="grades" class="table table-hover bg-white border">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Professor</th>
+                            <th>Date</th> <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="grades" t-as="grade">
+                            <tr>
+                                <td><span t-field="grade.enrollment_id.subject_id.name"/></td>
+                                <td><span t-field="grade.enrollment_id.professor_id.name"/></td>
+                                <td><span t-field="grade.create_date" t-options='{"widget": "date"}'/></td>
+                                <td>
+                                    <span t-attf-class="badge #{'text-bg-success' if grade.grade >= 5 else 'text-bg-danger'}" 
+                                          t-field="grade.grade"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>
