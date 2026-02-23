@@ -391,35 +391,37 @@
     <field name="model">university.student</field>
     <field name="arch" type="xml">
         <form>
+              <header>
+                <button name="action_send_report_email" 
+                        string="Send by Email" 
+                        type="object" 
+                        class="oe_highlight"/>
+                
+                <button name="%(university.action_student_report)d" 
+                        string="Print PDF" 
+                        type="action"/>
 
-            <header>
-                <button name="action_view_enrollments"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-graduation-cap">
+                <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
                     <field name="enrollment_count" widget="statinfo"/>
                 </button>
-
-                <button name="action_view_grades"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-star">
+                <button name="action_view_grades" type="object" class="oe_stat_button" icon="fa-star">
                     <field name="grade_count" widget="statinfo"/>
                 </button>
-            </header>
-
+               </header>
             <sheet>
                 <field name="enrollment_count" invisible="1"/>
                 <field name="grade_count" invisible="1"/>
-
+                <div class="oe_left" style="width: 155px;">
+                    <field name="image_1920" widget="image" class="oe_avatar"/>
+                </div>
+                <div class="oe_title">
+                    <h1><field name="name" placeholder="Student Name"/></h1>
+                </div>
                 <group>
-                    <field name="image_1920" widget="image"/>
-                </group>
-
-                <group>
-                    <field name="name"/>
-                    <field name="university_id"/>
-                    <field name="tutor_id"/>
+                    <group>
+                        <field name="email" placeholder="email@example.com"/> <field name="university_id"/>
+                        <field name="tutor_id"/>
+                    </group>
                 </group>
 
                 <group string="Address">
@@ -438,8 +440,7 @@
                                 <field name="professor_id"/>
                             </list>
                         </field>
-                    </page>
-
+                     </page>
                     <page string="Grades">
                         <field name="grade_ids">
                             <list>
@@ -448,8 +449,7 @@
                             </list>
                         </field>
                     </page>
-                </notebook>
-
+                  </notebook>
             </sheet>
         </form>
     </field>

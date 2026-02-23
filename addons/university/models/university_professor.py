@@ -60,3 +60,4 @@ class Professor(models.Model):
             "domain": [("professor_id", "=", self.id)],
             "context": {"default_professor_id": self.id},
         }
+        

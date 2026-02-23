@@ -46,3 +46,4 @@ class Subject(models.Model):
             "domain": [("subject_id", "=", self.id)],
             "context": {"default_subject_id": self.id},
         }
+        

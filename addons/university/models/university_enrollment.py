@@ -57,3 +57,4 @@ class Enrollment(models.Model):
         record.name = f"{prefix}/{year}/{count:04d}"
 
         return record
+        

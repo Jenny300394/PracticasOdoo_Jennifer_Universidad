@@ -1,0 +1,101 @@
+<odoo>
+    <template id="report_student_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h2 class="mb-4">STUDENT REPORT</h2>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong>Student Name:</strong> <span t-field="doc.name"/><br/>
+                                <strong>Address:</strong> <span t-field="doc.street"/>, <span t-field="doc.city"/><br/>
+                                <strong>University:</strong> <span t-field="doc.university_id.name"/>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Summary Table</h4>
+                        <table class="table table-sm table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Professor</th>
+                                    <th class="text-center">Average Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.enrollment_ids" t-as="enroll">
+                                    <tr>
+                                        <td><span t-field="enroll.subject_id.name"/></td>
+                                        <td><span t-field="enroll.professor_id.name"/></td>
+                                        <td class="text-center">
+                                            <t t-set="grades" t-value="enroll.grade_ids.mapped('grade')"/>
+                                            <t t-if="grades">
+                                                <t t-esc="'%.2f' % (sum(grades) / len(grades))"/>
+                                            </t>
+                                            <t t-else="">0.00</t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <h4 class="mt-4">Complete Grade History</h4>
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Professor</th>
+                                    <th class="text-center">Grade</th>
+                                    <th class="text-center">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.grade_ids" t-as="g">
+                                    <tr>
+                                        <td><span t-field="g.enrollment_id.subject_id.name"/></td>
+                                        <td><span t-field="g.enrollment_id.professor_id.name"/></td>
+                                        <td class="text-center"><span t-field="g.grade"/></td>
+                                        <td class="text-center"><span t-field="g.create_date" t-options='{"widget": "date"}'/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_student_report" model="ir.actions.report">
+        <field name="name">Student Report</field>
+        <field name="model">university.student</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university.report_student_pdf</field>
+        <field name="print_report_name">'Student - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_university_student"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="view_university_student_form_report_inherit" model="ir.ui.view">
+        <field name="name">university.student.form.report.inherit</field>
+        <field name="model">university.student</field>
+        <field name="inherit_id" ref="university.view_university_student_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(university.action_student_report)d" 
+                        string="Print PDF" 
+                        type="action" 
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

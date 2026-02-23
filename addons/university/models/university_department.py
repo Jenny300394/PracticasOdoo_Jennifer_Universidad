@@ -44,3 +44,4 @@ class Department(models.Model):
             "domain": [("department_id", "=", self.id)],
             "context": {"default_department_id": self.id},
         }
+        

@@ -18,3 +18,4 @@ class Grade(models.Model):
     )
 
     grade = fields.Float(string="Grade", required=True)
+    

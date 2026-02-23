@@ -142,3 +142,4 @@ class University(models.Model):
             "view_mode": "list,form",
             "domain": [("student_id.university_id", "=", self.id)],
         }
+        

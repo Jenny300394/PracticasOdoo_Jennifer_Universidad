@@ -5,3 +5,4 @@ from . import university_subject
 from . import university_student
 from . import university_enrollment
 from . import university_grade
+from . import university_report  
