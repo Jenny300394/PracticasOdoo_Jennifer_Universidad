@@ -5,32 +5,34 @@ class UniversityReport(models.Model):
     _description = 'University Report'
     _auto = False  
 
-    university_name = fields.Char(string="University")
-    department_name = fields.Char(string="Department")
-    professor_name = fields.Char(string="Professor")
-    student_name = fields.Char(string="Student")
-    subject_name = fields.Char(string="Subject")
-    average_grade = fields.Float(string="Average Grade")
+    university_name = fields.Char(string="University", readonly=True)
+    department_name = fields.Char(string="Department", readonly=True)
+    professor_name = fields.Char(string="Professor", readonly=True)
+    student_name = fields.Char(string="Student", readonly=True)
+    subject_name = fields.Char(string="Subject", readonly=True)
+    # Importante: group_operator="avg" hace que Odoo calcule la media en el pivote
+    average_grade = fields.Float(string="Average Grade", readonly=True, group_operator="avg")
 
     def init(self):
-        tools.drop_view_if_exists(self._cr, 'university_report')
-        self._cr.execute("""
-            CREATE VIEW university_report AS (
+        # Usamos self._table para asegurar que el nombre sea el que Odoo espera
+        tools.drop_view_if_exists(self.env.cr, self._table)
+        
+        self.env.cr.execute("""
+            CREATE OR REPLACE VIEW %s AS (
                 SELECT
-                    row_number() OVER () AS id,
+                    g.id AS id,
                     u.name AS university_name,
                     d.name AS department_name,
                     p.name AS professor_name,
                     s.name AS student_name,
                     sub.name AS subject_name,
-                    AVG(g.grade) AS average_grade
+                    g.grade AS average_grade
                 FROM university_grade g
-                JOIN university_enrollment e ON g.enrollment_id = e.id
-                JOIN university_student s ON e.student_id = s.id
-                JOIN university_professor p ON e.professor_id = p.id
-                JOIN university_subject sub ON e.subject_id = sub.id
-                JOIN university_department d ON p.department_id = d.id
-                JOIN university_university u ON s.university_id = u.id
-                GROUP BY u.name, d.name, p.name, s.name, sub.name
+                LEFT JOIN university_enrollment e ON g.enrollment_id = e.id
+                LEFT JOIN university_student s ON e.student_id = s.id
+                LEFT JOIN university_university u ON s.university_id = u.id
+                LEFT JOIN university_professor p ON e.professor_id = p.id
+                LEFT JOIN university_subject sub ON e.subject_id = sub.id
+                LEFT JOIN university_department d ON p.department_id = d.id
             )
-        """)
+        """ % self._table)
