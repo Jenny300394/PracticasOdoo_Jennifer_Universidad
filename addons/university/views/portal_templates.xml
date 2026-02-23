@@ -1,0 +1,33 @@
+<odoo>
+    <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t_if="grade_count" t_call="portal.portal_docs_entry">
+                <t t_set="title">Mis Notas</t>
+                <t t_set="url" t_value="'/my/grades'"/>
+                <t t_set="placeholder_count" t_value="'grade_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_my_grades_list" name="Mis Notas">
+        <t t_call="portal.portal_layout">
+            <h3>Tus Notas Académicas</h3>
+            <table class="table table-hover bg-white o_portal_my_doc_table">
+                <thead>
+                    <tr class="active">
+                        <th>Asignatura</th>
+                        <th>Nota</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t_foreach="grades" t_as="grade">
+                        <tr>
+                            <td><span t_field="grade.subject_id.name"/></td>
+                            <td><span t_field="grade.value" class="badge rounded-pill bg-info"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+    </template>
+</odoo>

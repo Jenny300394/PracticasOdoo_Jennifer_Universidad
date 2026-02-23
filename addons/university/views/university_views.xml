@@ -386,79 +386,79 @@
 </record>
 
 <!-- FORM VIEW -->
-<record id="view_university_student_form" model="ir.ui.view">
-    <field name="name">university.student.form</field>
-    <field name="model">university.student</field>
-    <field name="arch" type="xml">
-        <form>
-              <header>
-                <button name="action_send_report_email" 
-                        string="Send by Email" 
-                        type="object" 
-                        class="oe_highlight"/>
-                
-                <button name="%(university.action_student_report)d" 
-                        string="Print PDF" 
-                        type="action"/>
+    <record id="view_university_student_form" model="ir.ui.view">
+        <field name="name">university.student.form</field>
+        <field name="model">university.student</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send_report_email" 
+                            string="Send by Email" 
+                            type="object" 
+                            class="oe_highlight"/>
+                    
+                    <button name="%(university.action_student_report)d" 
+                            string="Print PDF" 
+                            type="action"/>
 
-                <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
-                    <field name="enrollment_count" widget="statinfo"/>
-                </button>
-                <button name="action_view_grades" type="object" class="oe_stat_button" icon="fa-star">
-                    <field name="grade_count" widget="statinfo"/>
-                </button>
-               </header>
-            <sheet>
-                <field name="enrollment_count" invisible="1"/>
-                <field name="grade_count" invisible="1"/>
-                <div class="oe_left" style="width: 155px;">
-                    <field name="image_1920" widget="image" class="oe_avatar"/>
-                </div>
-                <div class="oe_title">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1><field name="name" placeholder="Student Name"/></h1>
-                </div>
-                <group>
+                    <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="enrollment_count" widget="statinfo"/>
+                    </button>
+                    <button name="action_view_grades" type="object" class="oe_stat_button" icon="fa-star">
+                        <field name="grade_count" widget="statinfo"/>
+                    </button>
+                </header>
+                <sheet>
+                    <field name="enrollment_count" invisible="1"/>
+                    <field name="grade_count" invisible="1"/>
+                    <div class="oe_left" style="width: 155px;">
+                        <field name="image_1920" widget="image" class="oe_avatar"/>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Student Name"/></h1>
+                    </div>
                     <group>
-                        <field name="partner_id" string="Related Contact" placeholder="Select the user contact..."/>
-                        
-                        <field name="email" placeholder="email@example.com"/> 
-                        <field name="university_id"/>
-                        <field name="tutor_id"/>
+                        <group>
+                            <field name="partner_id" string="Related Contact" placeholder="Select the user contact..."/>
+                            <field name="user_id" string="Related User" readonly="1"/> 
+                            
+                            <field name="email" placeholder="email@example.com"/> 
+                            <field name="university_id"/>
+                            <field name="tutor_id"/>
+                        </group>
                     </group>
-                </group>
 
-                <group string="Address">
-                    <field name="street"/>
-                    <field name="city"/>
-                    <field name="state_id"/>
-                    <field name="zip"/>
-                    <field name="country_id"/>
-                </group>
+                    <group string="Address">
+                        <field name="street"/>
+                        <field name="city"/>
+                        <field name="state_id"/>
+                        <field name="zip"/>
+                        <field name="country_id"/>
+                    </group>
 
-                <notebook>
-                    <page string="Enrollments">
-                        <field name="enrollment_ids">
-                            <list>
-                                <field name="subject_id"/>
-                                <field name="professor_id"/>
-                            </list>
-                        </field>
-                     </page>
-                    <page string="Grades">
-                        <field name="grade_ids">
-                            <list>
-                                <field name="enrollment_id"/>
-                                <field name="grade"/>
-                            </list>
-                        </field>
-                    </page>
-                  </notebook>
-            </sheet>
-        </form>
-    </field>
-</record>
-
+                    <notebook>
+                        <page string="Enrollments">
+                            <field name="enrollment_ids">
+                                <list editable="bottom">
+                                    <field name="subject_id"/>
+                                    <field name="professor_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Grades">
+                            <field name="grade_ids">
+                                <list editable="bottom">
+                                    <field name="enrollment_id"/>
+                                    <field name="grade"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
 <!-- KANBAN VIEW -->
 <record id="view_university_student_kanban" model="ir.ui.view">
     <field name="name">university.student.kanban</field>
