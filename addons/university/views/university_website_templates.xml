@@ -1,0 +1,48 @@
+<odoo>
+    <template id="university_list_template" name="University List">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <h1 class="mb-4 text-center">Our Universities</h1>
+                <div class="row">
+                    <t t-foreach="universities" t-as="univ">
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <img t-attf-src="/web/image/university.university/#{univ.id}/image_1920" 
+                                     class="card-img-top" 
+                                     style="height: 200px; object-fit: cover;"/>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title" t-field="univ.name"/>
+                                    <a t-attf-href="/profesores/#{univ.id}" class="btn btn-primary">View Professors</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="professor_list_template" name="Professor List">
+        <t t-call="website.layout">
+            <div class="container mt-4">
+                <div class="text-center mb-5">
+                    <h1 t-field="university.name"/>
+                    <p class="text-muted">Teaching Staff</p>
+                </div>
+                <div class="row justify-content-center">
+                    <t t-foreach="professors" t-as="prof">
+                        <div class="col-md-3 mb-4 text-center">
+                            <img t-attf-src="/web/image/university.professor/#{prof.id}/image_1920" 
+                                 class="rounded-circle shadow" 
+                                 style="width: 150px; height: 150px; object-fit: cover;"/>
+                            <h5 class="mt-3" t-field="prof.name"/>
+                        </div>
+                    </t>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/universidad" class="btn btn-outline-secondary">Back to Universities</a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
