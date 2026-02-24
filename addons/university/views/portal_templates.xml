@@ -1,29 +1,39 @@
 <odoo>
     <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t_if="grade_count" t_call="portal.portal_docs_entry">
-                <t t_set="title">Mis Notas</t>
-                <t t_set="url" t_value="'/my/grades'"/>
-                <t t_set="placeholder_count" t_value="'grade_count'"/>
+            <t t-if="grade_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">My Grades</t>
+                <t t-set="url" t-value="'/my/grades'"/>
+                <t t-set="placeholder_count" t-value="'grade_count'"/>
             </t>
         </xpath>
     </template>
 
-    <template id="portal_my_grades_list" name="Mis Notas">
-        <t t_call="portal.portal_layout">
-            <h3>Tus Notas Académicas</h3>
+    <template id="portal_my_grades_list" name="My Grades">
+        <t t-call="portal.portal_layout">
+            <h3>Your Academic Grades</h3>
             <table class="table table-hover bg-white o_portal_my_doc_table">
                 <thead>
                     <tr class="active">
-                        <th>Asignatura</th>
-                        <th>Nota</th>
+                        <th>Subject</th>
+                        <th>Professor</th> <th>Date</th>      <th>Grade</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <t t_foreach="grades" t_as="grade">
+                    <t t-foreach="grades" t-as="g">
                         <tr>
-                            <td><span t_field="grade.subject_id.name"/></td>
-                            <td><span t_field="grade.value" class="badge rounded-pill bg-info"/></td>
+                            <td>
+                                <span t-if="g.enrollment_id" t-field="g.enrollment_id.subject_id.name"/>
+                            </td>
+                            <td>
+                                <span t-if="g.enrollment_id" t-field="g.enrollment_id.professor_id.name"/>
+                            </td>
+                            <td>
+                                <span t-field="g.create_date" t-options='{"widget": "date"}'/>
+                            </td>
+                            <td>
+                                <span t-field="g.grade" class="badge rounded-pill bg-info"/>
+                            </td>
                         </tr>
                     </t>
                 </tbody>

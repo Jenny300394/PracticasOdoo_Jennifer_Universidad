@@ -2,29 +2,27 @@
     <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
             <t t-if="grade_count" t-call="portal.portal_docs_entry">
-                <t t-set="title">Mis Notas</t>
+                <t t-set="title">Grades</t>
                 <t t-set="url" t-value="'/my/grades'"/>
                 <t t-set="placeholder_count" t-value="'grade_count'"/>
-                <t t-set="count" t-value="grade_count"/>
             </t>
         </xpath>
     </template>
 
-    <template id="portal_my_grades_template" name="My Grades">
+    <template id="portal_my_grades_list" name="My Grades">
         <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            
             <div class="container mt-3">
-                <h3 class="mb-4">Mis Notas Académicas</h3>
+                <h3 class="mb-4">Academic Grades History</h3>
                 
-                <t t-if="not grades">
-                    <div class="alert alert-info text-center">No tienes notas registradas.</div>
-                </t>
-
-                <table t-if="grades" class="table table-hover bg-white border">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Asignatura</th>
-                            <th>Profesor</th>
-                            <th class="text-center">Calificación</th>
+                <table class="table table-hover bg-white o_portal_my_doc_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Subject</th>
+                            <th>Professor</th>
+                            <th>Date</th>
+                            <th class="text-center">Grade</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,11 +30,12 @@
                             <tr>
                                 <td>
                                     <span t-if="g.enrollment_id" t-field="g.enrollment_id.subject_id.name"/>
-                                    <span t-else="" class="text-muted">-</span>
                                 </td>
                                 <td>
                                     <span t-if="g.enrollment_id" t-field="g.enrollment_id.professor_id.name"/>
-                                    <span t-else="" class="text-muted">-</span>
+                                </td>
+                                <td>
+                                    <span t-field="g.create_date" t-options='{"widget": "date"}'/>
                                 </td>
                                 <td class="text-center">
                                     <span t-attf-class="badge rounded-pill #{'text-bg-success' if g.grade >= 5 else 'text-bg-danger'}" 

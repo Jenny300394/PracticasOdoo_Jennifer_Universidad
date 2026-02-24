@@ -1,15 +1,17 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 class Student(models.Model):
     _name = "university.student"
     _description = "Student"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     # --- Campos principales ---
-    name = fields.Char(string="Name", required=True)
-    partner_id = fields.Many2one("res.partner", string="Related Contact")
+    name = fields.Char(string="Name", required=True, tracking=True)
+    partner_id = fields.Many2one("res.partner", string="Related Contact", ondelete='restrict')
     user_id = fields.Many2one("res.users", string="Related User", readonly=True)
     
-    email = fields.Char(string="Email")
+    email = fields.Char(string="Email", tracking=True)
     image_1920 = fields.Image(string="Image")
    
     university_id = fields.Many2one("university.university", string="University", required=True)
@@ -22,7 +24,7 @@ class Student(models.Model):
     zip = fields.Char(string="ZIP")
     country_id = fields.Many2one("res.country", string="Country")
     
-    # --- Relaciones y Cuentas ---
+    # --- Relaciones ---
     enrollment_ids = fields.One2many("university.enrollment", "student_id", string="Enrollments")
     grade_ids = fields.One2many("university.grade", "student_id", string="Grades")
     
@@ -32,79 +34,73 @@ class Student(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            # 1. Crear el Partner (Contacto)
+            # 1. Asegurar el Partner
             if not vals.get('partner_id'):
                 partner = self.env['res.partner'].sudo().create({
                     'name': vals.get('name'),
                     'email': vals.get('email'),
                 })
                 vals['partner_id'] = partner.id
+            else:
+                partner = self.env['res.partner'].sudo().browse(vals['partner_id'])
 
             # 2. Gestionar el Usuario
             login = vals.get('email') or vals.get('name').replace(" ", ".").lower()
             user = self.env['res.users'].sudo().search([('login', '=', login)], limit=1)
             
             if not user:
-                # Primero creamos el usuario base
-                user = self.env['res.users'].sudo().create({
-                    'name': vals.get('name'),
-                    'login': login,
-                    'partner_id': vals.get('partner_id'),
-                    'email': vals.get('email'),
+                # Solo usamos el wizard si el partner NO tiene usuario todavía
+                # Esto evita el error de "Already has portal access"
+                wizard = self.env['portal.wizard'].sudo().create({
+                    'partner_ids': [(4, partner.id)]
                 })
+                # El wizard crea el usuario y le asigna el grupo portal automáticamente
+                wizard.user_ids.action_grant_access()
                 
-                # 3. EL TRUCO PARA EL CHEK AUTOMÁTICO:
-                try:
-                    group_portal = self.env.ref('base.group_portal')
-                    
-                    # El comando (6, 0, [ID]) LIMPIA todos los grupos previos 
-                    # (incluyendo el de 'User') y deja SOLO el de Portal.
-                    user.sudo().write({
-                        'groups_id': [(6, 0, [group_portal.id])]
-                    })
-                except Exception:
-                    pass
+                # Buscamos el usuario recién creado para guardarlo en el estudiante
+                user = self.env['res.users'].sudo().search([('partner_id', '=', partner.id)], limit=1)
             
-            vals['user_id'] = user.id
+            if user:
+                vals['user_id'] = user.id
             
         return super(Student, self).create(vals_list)
 
-    # --- Campos Computados ---
+    # --- Resto de métodos (Computados y Acciones) ---
+    @api.depends('enrollment_ids')
     def _compute_enrollment_count(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
 
+    @api.depends('grade_ids')
     def _compute_grade_count(self):
         for record in self:
             record.grade_count = len(record.grade_ids)
 
-    # --- Acciones (Botones) ---
     def action_view_enrollments(self):
         self.ensure_one()
         return {
+            "name": "Inscripciones",
             "type": "ir.actions.act_window", 
             "res_model": "university.enrollment", 
             "view_mode": "list,form", 
-            "domain": [("student_id", "=", self.id)]
+            "domain": [("student_id", "=", self.id)],
+            "context": {'default_student_id': self.id}
         }
 
     def action_view_grades(self):
         self.ensure_one()
         return {
+            "name": "Calificaciones",
             "type": "ir.actions.act_window", 
             "res_model": "university.grade", 
             "view_mode": "list,form", 
-            "domain": [("student_id", "=", self.id)]
+            "domain": [("student_id", "=", self.id)],
+            "context": {'default_student_id': self.id}
         }
 
     def action_send_report_email(self):
         self.ensure_one()
-        try:
-            template = self.env.ref('university.email_template_student_report')
-            template_id = template.id
-        except:
-            template_id = False
-
+        template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window', 
             'view_mode': 'form', 
@@ -113,6 +109,6 @@ class Student(models.Model):
             'context': {
                 'default_model': 'university.student', 
                 'default_res_ids': self.ids,
-                'default_template_id': template_id,
+                'default_template_id': template.id if template else False,
             }
         }
