@@ -1,0 +1,133 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#      * university
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0-20260217\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-24 13:41+0000\n"
+"PO-Revision-Date: 2026-02-24 13:41+0000\n"
+"Last-Translator: Jennifer\n"
+"Language-Team: Spanish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: university
+#: model:ir.actions.report,print_report_name:university.action_student_report
+msgid "'Student - %s' % (object.name)"
+msgstr "'Estudiante - %s' % (object.name)"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
+msgid "<strong>Student Name:</strong>"
+msgstr "<strong>Nombre del Estudiante:</strong>"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+msgid "Academic Grades History"
+msgstr "Historial de Calificaciones Académicas"
+
+#. module: university
+#: model:mail.template,subject:university.email_template_student_report
+msgid "Academic Report: {{ object.name }}"
+msgstr "Informe Académico: {{ object.name }}"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Address"
+msgstr "Dirección"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_report__average_grade
+#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
+msgid "Average Grade"
+msgstr "Nota Media"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.professor_list_template
+msgid "Back to Universities"
+msgstr "Volver a Universidades"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_student__city
+#: model:ir.model.fields,field_description:university.field_university_university__city
+msgid "City"
+msgstr "Ciudad"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
+msgid "Complete Grade History"
+msgstr "Historial Completo de Notas"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_student__country_id
+#: model:ir.model.fields,field_description:university.field_university_university__country_id
+msgid "Country"
+msgstr "País"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
+msgid "Date"
+msgstr "Fecha"
+
+#. module: university
+#: model:ir.model,name:university.model_university_department
+#: model:ir.model.fields,field_description:university.field_university_professor__department_id
+#: model:ir.model.fields,field_description:university.field_university_report__department_name
+msgid "Department"
+msgstr "Departamento"
+
+#. module: university
+#: model:ir.actions.act_window,name:university.action_university_department
+#: model:ir.ui.menu,name:university.menu_university_departments
+msgid "Departments"
+msgstr "Departamentos"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_student__email
+msgid "Email"
+msgstr "Correo electrónico"
+
+#. module: university
+#: model:ir.model,name:university.model_university_enrollment
+msgid "Enrollment"
+msgstr "Matrícula"
+
+#. module: university
+#: model:ir.actions.act_window,name:university.action_university_enrollment
+#: model:ir.ui.menu,name:university.menu_university_enrollments
+msgid "Enrollments"
+msgstr "Matrículas"
+
+#. module: university
+#: model:ir.model,name:university.model_university_grade
+#: model:ir.model.fields,field_description:university.field_university_grade__grade
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
+msgid "Grade"
+msgstr "Calificación"
+
+#. module: university
+#: model:ir.actions.act_window,name:university.action_university_grade
+#: model:ir.ui.menu,name:university.menu_university_grades
+#: model_terms:ir.ui.view,arch_db:university.portal_my_home_menu_grades
+msgid "Grades"
+msgstr "Calificaciones"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_professor__image_1920
+#: model:ir.model.fields,field_description:university.field_university_student__image_1920
+#: model:ir.model.fields,field_description:university.field_university_university__image_1920
+msgid "Image"
+msgstr "Imagen"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_department__name
+#: model:ir.model.fields,field_description:university.field_university_professor__name
+#: model:ir.model.fields,field_description:university.field_university_student__name
+#: model:ir.model.fields,field_description:university.field_university_subject__name
+#: model:ir.model.fields,field_description:university.field_university_
