@@ -418,25 +418,26 @@
                         <label for="name" class="oe_edit_only"/>
                         <h1><field name="name" placeholder="Student Name"/></h1>
                     </div>
-                    <group>
-                        <group>
-                            <field name="partner_id" string="Related Contact" placeholder="Select the user contact..."/>
-                            <field name="user_id" string="Related User" readonly="1"/> 
-                            
-                            <field name="email" placeholder="email@example.com"/> 
-                            <field name="university_id"/>
-                            <field name="tutor_id"/>
-                        </group>
-                    </group>
-
-                    <group string="Address">
-                        <field name="street"/>
-                        <field name="city"/>
-                        <field name="state_id"/>
-                        <field name="zip"/>
-                        <field name="country_id"/>
-                    </group>
-
+               <group>
+    <group>
+        <field name="partner_id" string="Related Contact" placeholder="Select the user contact..."/>
+        <field name="user_id" string="Related User" readonly="1"/> 
+        
+        <label for="email"/>
+        <div class="o_row">
+            <field name="email" placeholder="email@example.com" nolabel="1"/>
+            <button name="action_send_grades_summary_js" 
+                    type="object" 
+                    class="btn btn-link p-0" 
+                    icon="fa-info-circle" 
+                    title="Send grades summary"
+                    invisible="not email"/>
+        </div>
+        
+        <field name="university_id"/>
+        <field name="tutor_id"/>
+    </group>
+</group>
                     <notebook>
                         <page string="Enrollments">
                             <field name="enrollment_ids">

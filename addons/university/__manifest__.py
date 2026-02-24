@@ -16,6 +16,13 @@
         "views/university_website_templates.xml", 
         "views/university_portal_templates.xml", 
     ],
+   
+    "assets": {
+        "web.assets_backend": [
+            "university/static/src/js/notification.js",
+        ],
+    },
+  
     "installable": True,
     "application": True
 }
