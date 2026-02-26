@@ -76,7 +76,7 @@ class Student(models.Model):
             "name": "Professors",
         }
 
-    # --- Acción para enviar reporte por email (Wizard) ---
+    # --- Envío de reporte por email (Ventana emergente) ---
     def action_send_report_email(self):
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
@@ -92,11 +92,22 @@ class Student(models.Model):
             }
         }
 
-    # --- LA FUNCIÓN QUE FALTABA ---
+    # --- BOTÓN DE LA "i" (Quick Summary) ---
     def action_send_grades_summary_js(self):
-        """ Envía el correo directamente sin abrir ventana """
+        """ Envía el correo directamente y notifica al usuario """
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
         if template:
             template.send_mail(self.id, force_send=True)
+            # Notificación visual de éxito en Odoo
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': '¡Enviado!',
+                    'message': 'El resumen de notas ha sido enviado correctamente.',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
         return True
