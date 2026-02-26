@@ -4,127 +4,59 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
-                    <div class="page">
-
-                        <!-- Estilos personalizados -->
+                    <div class="page" style="font-family: 'Helvetica', sans-serif;">
+                        
                         <style>
-                            .report-title {
-                                font-size: 26px;
-                                font-weight: 700;
-                                letter-spacing: 1px;
-                                text-transform: uppercase;
-                                margin-bottom: 10px;
-                                color: #2c3e50;
-                            }
-
-                            .header-line {
-                                width: 100%;
-                                border-bottom: 3px solid #2c3e50;
-                                margin-bottom: 25px;
-                                padding-bottom: 5px;
-                            }
-
-                            .info-box {
-                                background: #f8f9fa;
-                                border: 1px solid #dcdcdc;
-                                border-radius: 8px;
-                                padding: 15px 20px;
-                                margin-bottom: 25px;
-                                font-size: 14px;
-                            }
-
-                            .info-box strong {
-                                color: #2c3e50;
-                            }
-
-                            .table-grades {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-top: 10px;
-                            }
-
-                            .table-grades th {
-                                background: #34495e;
-                                color: white;
-                                padding: 10px;
-                                font-size: 13px;
-                                border: 1px solid #2c3e50;
-                                text-align: center;
-                            }
-
-                            .table-grades td {
-                                border: 1px solid #d0d0d0;
-                                padding: 8px;
-                                font-size: 13px;
-                            }
-
-                            .grade-pass {
-                                font-weight: bold;
-                                color: #27ae60;
-                            }
-
-                            .grade-fail {
-                                font-weight: bold;
-                                color: #c0392b;
-                            }
-
-                            .average-box {
-                                margin-top: 25px;
-                                font-size: 16px;
-                                text-align: right;
-                                color: #2c3e50;
-                            }
+                            .report-header { border-left: 8px solid #34495e; padding-left: 15px; margin-bottom: 30px; }
+                            .report-title { font-size: 28px; font-weight: bold; color: #2c3e50; }
+                            .info-card { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; margin-bottom: 30px; }
+                            .table-modern { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                            .table-modern th { background-color: #34495e; color: white; padding: 10px; text-align: left; }
+                            .table-modern td { padding: 10px; border-bottom: 1px solid #eee; }
+                            .badge-pass { color: #27ae60; font-weight: bold; }
+                            .badge-fail { color: #c0392b; font-weight: bold; }
                         </style>
 
-                        <!-- Encabezado -->
-                        <div class="header-line">
-                            <table style="width: 100%;">
-                                <tr>
-                                    <td>
-                                        <div class="report-title">Reporte Académico</div>
-                                    </td>
-                                    <td class="text-end" style="font-size: 14px;">
-                                        <strong>Fecha:</strong>
-                                        <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <!-- Información del alumno -->
-                        <div class="info-box">
+                        <div class="report-header">
                             <div class="row">
-                                <div class="col-6">
-                                    <strong>Alumno:</strong> <span t-field="doc.name"/><br/>
-                                    <strong>Universidad:</strong> <span t-field="doc.university_id.name"/>
+                                <div class="col-7">
+                                    <h1 class="report-title">Expediente Académico</h1>
                                 </div>
-                                <div class="col-6 text-end">
-                                    <strong>Tutor:</strong> <span t-field="doc.tutor_id.name"/><br/>
-                                    <strong>Email:</strong> <span t-field="doc.email"/>
+                                <div class="col-5 text-end">
+                                    <strong>Fecha:</strong>
+                                    <span t-esc="datetime.date.today().strftime('%d/%m/%Y')"/>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tabla de calificaciones -->
-                        <table class="table-grades">
+                        <div class="info-card">
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Estudiante:</strong> <span t-field="doc.name"/><br/>
+                                    <strong>Email:</strong> <span t-field="doc.email"/>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong>Universidad:</strong> <span t-field="doc.university_id.name"/><br/>
+                                    <strong>Tutor:</strong> <span t-field="doc.tutor_id.name"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table-modern">
                             <thead>
                                 <tr>
-                                    <th class="text-start">Asignatura</th>
+                                    <th>Asignatura</th>
                                     <th>Profesor</th>
-                                    <th>Calificación</th>
+                                    <th class="text-center">Nota</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-foreach="doc.grade_ids" t-as="g">
                                     <tr>
-                                        <td class="text-start">
-                                            <span t-field="g.enrollment_id.subject_id.name"/>
-                                        </td>
-                                        <td>
-                                            <span t-field="g.enrollment_id.professor_id.name"/>
-                                        </td>
-                                        <td>
-                                            <span t-att-class="g.grade &lt; 5 and 'grade-fail' or 'grade-pass'">
+                                        <td><span t-field="g.enrollment_id.subject_id.name"/></td>
+                                        <td><span t-field="g.enrollment_id.professor_id.name"/></td>
+                                        <td class="text-center">
+                                            <span t-att-class="g.grade &gt;= 5 and 'badge-pass' or 'badge-fail'">
                                                 <span t-field="g.grade"/>
                                             </span>
                                         </td>
@@ -133,14 +65,17 @@
                             </tbody>
                         </table>
 
-                        <!-- Nota media -->
-                        <div class="average-box">
-                            <t t-set="grades_list" t-value="doc.grade_ids.mapped('grade')"/>
-                            <strong>Nota Media: </strong>
-                            <span t-if="grades_list"
-                                  t-esc="sum(grades_list) / len(grades_list)"
-                                  t-options='{"widget": "float", "precision": 2}'/>
-                            <span t-else="">0.00</span>
+                        <div class="row mt-4">
+                            <div class="col-12 text-end">
+                                <t t-set="grades" t-value="doc.grade_ids.mapped('grade')"/>
+                                <div style="font-size: 18px; font-weight: bold; background: #2c3e50; color: white; display: inline-block; padding: 10px 20px; border-radius: 5px;">
+                                    MEDIA TOTAL: 
+                                    <t t-if="grades">
+                                        <t t-esc="sum(grades) / len(grades)" t-options='{"widget": "float", "precision": 2}'/>
+                                    </t>
+                                    <t t-else="">0.00</t>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -149,7 +84,6 @@
         </t>
     </template>
 
-    <!-- Acción del reporte -->
     <record id="action_student_report" model="ir.actions.report">
         <field name="name">Certificado de Notas</field>
         <field name="model">university.student</field>
