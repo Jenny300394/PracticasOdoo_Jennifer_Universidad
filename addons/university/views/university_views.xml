@@ -324,49 +324,51 @@
 
 <!-- FORM VIEW -->
 <record id="view_university_subject_form" model="ir.ui.view">
-        <field name="name">university.subject.form</field>
-        <field name="model">university.subject</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
-                            <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
-                        </button>
-                        <button name="action_view_students" type="object" class="oe_stat_button" icon="fa-users">
-                            <field name="student_count" widget="statinfo" string="Students"/>
-                        </button>
-                    </div>
+    <field name="name">university.subject.form</field>
+    <field name="model">university.subject</field>
+    <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
+                    </button>
+                    <button name="action_view_students" type="object" class="oe_stat_button" icon="fa-users">
+                        <field name="student_count" widget="statinfo" string="Students"/>
+                    </button>
+                    <button name="action_view_professors" type="object" class="oe_stat_button" icon="fa-briefcase">
+                        <field name="professor_count" widget="statinfo" string="Professors"/>
+                    </button>
+                </div>
 
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h1><field name="name" placeholder="Subject Name"/></h1>
-                    </div>
+                <div class="oe_title">
+                    <label for="name"/>
+                    <h1><field name="name" placeholder="Subject Name"/></h1>
+                </div>
 
+                <group>
                     <group>
-                        <group>
-                            <field name="university_id"/>
-                        </group>
-                        <group>
-                            <field name="professor_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                        </group>
+                        <field name="university_id"/>
                     </group>
+                    <group>
+                        <field name="professor_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                </group>
 
-                    <notebook>
-                        <page string="Enrollments">
-                            <field name="enrollment_ids">
-                                <list readonly="1">
-                                    <field name="student_id"/>
-                                    <field name="professor_id"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
+                <notebook>
+                    <page string="Enrollments">
+                        <field name="enrollment_ids">
+                            <list readonly="1">
+                                <field name="student_id"/>
+                                <field name="professor_id"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
+</record>
 <!-- KANBAN VIEW -->
 <record id="view_university_subject_kanban" model="ir.ui.view">
         <field name="name">university.subject.kanban</field>
