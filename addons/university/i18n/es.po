@@ -131,3 +131,36 @@ msgstr "Imagen"
 #: model:ir.model.fields,field_description:university.field_university_student__name
 #: model:ir.model.fields,field_description:university.field_university_subject__name
 #: model:ir.model.fields,field_description:university.field_university_
+#: model:ir.model.fields,field_description:university.field_university_university__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: university
+#: model:ir.model,name:university.model_university_professor
+#: model:ir.ui.menu,name:university.menu_university_professors
+msgid "Professor"
+msgstr "Profesor"
+
+#. module: university
+#: model:ir.model,name:university.model_university_student
+#: model:ir.ui.menu,name:university.menu_university_students
+msgid "Student"
+msgstr "Estudiante"
+
+#. module: university
+#: model:ir.model,name:university.model_university_subject
+#: model:ir.ui.menu,name:university.menu_university_subjects
+msgid "Subject"
+msgstr "Asignatura"
+
+#. module: university
+#: model:ir.model,name:university.model_university_university
+#: model:ir.ui.menu,name:university.menu_university_root
+msgid "University"
+msgstr "Universidad"
+
+#. module: university
+#: model:ir.model,name:university.model_university_report
+#: model:ir.ui.menu,name:university.menu_university_reports
+msgid "University Report"
+msgstr "Informe Universitario"

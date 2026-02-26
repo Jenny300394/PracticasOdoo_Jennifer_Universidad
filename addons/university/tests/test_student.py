@@ -1,4 +1,3 @@
-
 from odoo.tests.common import TransactionCase
 
 class TestStudent(TransactionCase):

@@ -396,10 +396,6 @@
                             string="Send by Email" 
                             type="object" 
                             class="oe_highlight"/>
-                    
-                    <button name="%(university.action_student_report)d" 
-                            string="Print PDF" 
-                            type="action"/>
 
                     <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
                         <field name="enrollment_count" widget="statinfo"/>
