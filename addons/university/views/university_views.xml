@@ -145,31 +145,33 @@
     <field name="model">university.department</field>
     <field name="arch" type="xml">
         <form>
-            <header>
-                <button name="action_view_professors"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-users">
-                    <field name="professor_count" widget="statinfo"/>
-                </button>
-            </header>
-
             <sheet>
-                <field name="professor_count" invisible="1"/>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_professors" type="object" class="oe_stat_button" icon="fa-users">
+                        <field name="professor_count" string="Profesores" widget="statinfo"/>
+                    </button>
+                </div>
+
+                <div class="oe_title">
+                    <label for="name" string="Departamento"/>
+                    <h1>
+                        <field name="name" placeholder="Ej. Facultad de Ciencias"/>
+                    </h1>
+                </div>
 
                 <group>
-                    <field name="name"/>
-                    <field name="university_id"/>
-                    <field name="manager_id"/>
+                    <group>
+                        <field name="university_id"/>
+                        <field name="manager_id"/>
+                    </group>
                 </group>
 
                 <notebook>
-                    <page string="Professors">
+                    <page string="Profesores Asignados" name="professors">
                         <field name="professor_ids">
-                            <list>
+                            <list editable="bottom">
                                 <field name="name"/>
-                                <field name="department_id"/>
-                            </list>
+                                </list>
                         </field>
                     </page>
                 </notebook>
@@ -177,23 +179,35 @@
         </form>
     </field>
 </record>
-
 <!-- KANBAN VIEW -->
 <record id="view_university_department_kanban" model="ir.ui.view">
     <field name="name">university.department.kanban</field>
     <field name="model">university.department</field>
     <field name="arch" type="xml">
-        <kanban>
+        <kanban sample="1">
             <field name="name"/>
             <field name="manager_id"/>
             <field name="university_id"/>
-
             <templates>
                 <t t-name="card">
-                    <div class="oe_kanban_global_click">
-                        <strong><field name="name"/></strong>
-                        <div>Manager: <field name="manager_id"/></div>
-                        <div>University: <field name="university_id"/></div>
+                    <div class="oe_kanban_global_click d-flex flex-column p-2">
+                        <div class="o_kanban_record_title h5 fw-bold mb-1">
+                            <field name="name"/>
+                        </div>
+                        
+                        <div class="text-muted small">
+                            <i class="fa fa-university me-1 text-primary"/>
+                            <field name="university_id"/>
+                        </div>
+                        
+                        <div class="mt-2">
+                            <t t-if="record.manager_id.raw_value">
+                                <span class="badge rounded-pill text-bg-light border">
+                                    <i class="fa fa-user me-1 text-secondary"/>
+                                    <field name="manager_id"/>
+                                </span>
+                            </t>
+                        </div>
                     </div>
                 </t>
             </templates>
