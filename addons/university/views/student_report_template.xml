@@ -1,74 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_student_pdf">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <div class="page">
-                        <div class="oe_structure"/>
-                        
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <h2 class="mb-4">STUDENT REPORT</h2>
+                        <style>
+                            .header-table { width: 100%; border-bottom: 2px solid black; margin-bottom: 20px; }
+                            .info-box { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; border-radius: 5px; background-color: #fcfcfc; }
+                            .table-grades { width: 100%; border-collapse: collapse; }
+                            .table-grades th { background-color: #eee; border: 1px solid #ddd; padding: 8px; }
+                            .table-grades td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        </style>
+
+                        <table class="header-table">
+                            <tr>
+                                <td><h2>REPORTE ACADÉMICO</h2></td>
+                                <td class="text-end">
+                                    <strong>Fecha:</strong> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y')"/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="info-box">
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Alumno:</strong> <span t-field="doc.name"/><br/>
+                                    <strong>Universidad:</strong> <span t-field="doc.university_id.name"/>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong>Tutor:</strong> <span t-field="doc.tutor_id.name"/><br/>
+                                    <strong>Email:</strong> <span t-field="doc.email"/>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row mb-4">
-                            <div class="col-6">
-                                <strong>Student Name:</strong> <span t-field="doc.name"/><br/>
-                                <strong>Address:</strong> <span t-field="doc.street"/>, <span t-field="doc.city"/><br/>
-                                <strong>University:</strong> <span t-field="doc.university_id.name"/>
-                            </div>
-                        </div>
-
-                        <h4 class="mt-4">Summary Table</h4>
-                        <table class="table table-sm table-bordered">
-                            <thead class="bg-light">
+                        <table class="table-grades">
+                            <thead>
                                 <tr>
-                                    <th>Subject</th>
-                                    <th>Professor</th>
-                                    <th class="text-center">Average Grade</th>
+                                    <th class="text-start">Asignatura</th>
+                                    <th>Profesor</th>
+                                    <th>Calificación</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="doc.enrollment_ids" t-as="enroll">
+                                <t t-foreach="doc.grade_ids" t-as="g">
                                     <tr>
-                                        <td><span t-field="enroll.subject_id.name"/></td>
-                                        <td><span t-field="enroll.professor_id.name"/></td>
-                                        <td class="text-center">
-                                            <t t-set="grades" t-value="enroll.grade_ids.mapped('grade')"/>
-                                            <t t-if="grades">
-                                                <t t-esc="'%.2f' % (sum(grades) / len(grades))"/>
-                                            </t>
-                                            <t t-else="">0.00</t>
+                                        <td class="text-start"><span t-field="g.enrollment_id.subject_id.name"/></td>
+                                        <td><span t-field="g.enrollment_id.professor_id.name"/></td>
+                                        <td>
+                                            <span t-attf-style="font-weight: bold; color: #{g.grade &lt; 5 and 'red' or 'green'};">
+                                                <span t-field="g.grade"/>
+                                            </span>
                                         </td>
                                     </tr>
                                 </t>
                             </tbody>
                         </table>
 
-                        <h4 class="mt-4">Complete Grade History</h4>
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Professor</th>
-                                    <th class="text-center">Grade</th>
-                                    <th class="text-center">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <t t-foreach="doc.grade_ids" t-as="g">
-                                    <tr>
-                                        <td><span t-field="g.enrollment_id.subject_id.name"/></td>
-                                        <td><span t-field="g.enrollment_id.professor_id.name"/></td>
-                                        <td class="text-center"><span t-field="g.grade"/></td>
-                                        <td class="text-center"><span t-field="g.create_date" t-options='{"widget": "date"}'/></td>
-                                    </tr>
-                                </t>
-                            </tbody>
-                        </table>
-                        
-                        <div class="oe_structure"/>
+                        <div class="mt-4 text-end" style="font-size: 1.2em;">
+                            <t t-set="grades_list" t-value="doc.grade_ids.mapped('grade')"/>
+                            <strong>Nota Media: </strong>
+                            <span t-if="grades_list" t-esc="sum(grades_list) / len(grades_list)" t-options='{"widget": "float", "precision": 2}'/>
+                            <span t-else="">0.00</span>
+                        </div>
                     </div>
                 </t>
             </t>
@@ -76,26 +71,11 @@
     </template>
 
     <record id="action_student_report" model="ir.actions.report">
-        <field name="name">Student Report</field>
+        <field name="name">Certificado de Notas</field>
         <field name="model">university.student</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">university.report_student_pdf</field>
-        <field name="print_report_name">'Student - %s' % (object.name)</field>
         <field name="binding_model_id" ref="model_university_student"/>
         <field name="binding_type">report</field>
-    </record>
-
-    <record id="view_university_student_form_report_inherit" model="ir.ui.view">
-        <field name="name">university.student.form.report.inherit</field>
-        <field name="model">university.student</field>
-        <field name="inherit_id" ref="university.view_university_student_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//header" position="inside">
-                <button name="%(university.action_student_report)d" 
-                        string="Print PDF" 
-                        type="action" 
-                        class="oe_highlight"/>
-            </xpath>
-        </field>
     </record>
 </odoo>
