@@ -1,149 +1,59 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#      * university
+#     * university
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0-20260217\n"
+"Project-Id-Version: Odoo Server 19.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-24 13:41+0000\n"
-"PO-Revision-Date: 2026-02-24 13:41+0000\n"
+"POT-Creation-Date: 2026-02-27 12:00+0000\n"
+"PO-Revision-Date: 2026-02-27 12:00+0000\n"
 "Last-Translator: Jennifer\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: university
-#: model:ir.actions.report,print_report_name:university.action_student_report
-msgid "'Student - %s' % (object.name)"
-msgstr "'Estudiante - %s' % (object.name)"
+#: model:ir.actions.act_window,name:university.action_university_professor
+#: model:ir.ui.menu,name:university.menu_university_professors
+msgid "Professors"
+msgstr "Profesores"
 
 #. module: university
-#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
-msgid "<strong>Student Name:</strong>"
-msgstr "<strong>Nombre del Estudiante:</strong>"
+#: model:ir.actions.act_window,name:university.action_university_student
+#: model:ir.ui.menu,name:university.menu_university_students
+msgid "Students"
+msgstr "Estudiantes"
 
 #. module: university
-#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
-msgid "Academic Grades History"
-msgstr "Historial de Calificaciones Académicas"
+# --- Esto arregla el desplegable de Informes ---
+#: model:ir.actions.act_window,name:university.action_university_report
+#: model:ir.model,name:university.model_university_report
+#: model:ir.ui.menu,name:university.menu_university_reports
+msgid "University Report"
+msgstr "Informe Universitario"
 
 #. module: university
-#: model:mail.template,subject:university.email_template_student_report
-msgid "Academic Report: {{ object.name }}"
-msgstr "Informe Académico: {{ object.name }}"
-
-#. module: university
-#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
-msgid "Address"
-msgstr "Dirección"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_report__average_grade
-#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
-msgid "Average Grade"
-msgstr "Nota Media"
-
-#. module: university
-#: model_terms:ir.ui.view,arch_db:university.professor_list_template
-msgid "Back to Universities"
-msgstr "Volver a Universidades"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_student__city
-#: model:ir.model.fields,field_description:university.field_university_university__city
-msgid "City"
-msgstr "Ciudad"
-
-#. module: university
-#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
-msgid "Complete Grade History"
-msgstr "Historial Completo de Notas"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_student__country_id
-#: model:ir.model.fields,field_description:university.field_university_university__country_id
-msgid "Country"
-msgstr "País"
-
-#. module: university
-#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
-#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
-msgid "Date"
-msgstr "Fecha"
+#: model:ir.model,name:university.model_university_university
+#: model:ir.ui.menu,name:university.menu_university_root
+msgid "University"
+msgstr "Universidad"
 
 #. module: university
 #: model:ir.model,name:university.model_university_department
-#: model:ir.model.fields,field_description:university.field_university_professor__department_id
-#: model:ir.model.fields,field_description:university.field_university_report__department_name
+#: model:ir.ui.menu,name:university.menu_university_departments
 msgid "Department"
 msgstr "Departamento"
 
 #. module: university
-#: model:ir.actions.act_window,name:university.action_university_department
-#: model:ir.ui.menu,name:university.menu_university_departments
-msgid "Departments"
-msgstr "Departamentos"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_student__email
-msgid "Email"
-msgstr "Correo electrónico"
-
-#. module: university
-#: model:ir.model,name:university.model_university_enrollment
-msgid "Enrollment"
-msgstr "Matrícula"
-
-#. module: university
-#: model:ir.actions.act_window,name:university.action_university_enrollment
-#: model:ir.ui.menu,name:university.menu_university_enrollments
-msgid "Enrollments"
-msgstr "Matrículas"
-
-#. module: university
-#: model:ir.model,name:university.model_university_grade
-#: model:ir.model.fields,field_description:university.field_university_grade__grade
-#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
-#: model_terms:ir.ui.view,arch_db:university.report_student_pdf
-msgid "Grade"
-msgstr "Calificación"
-
-#. module: university
-#: model:ir.actions.act_window,name:university.action_university_grade
-#: model:ir.ui.menu,name:university.menu_university_grades
-#: model_terms:ir.ui.view,arch_db:university.portal_my_home_menu_grades
-msgid "Grades"
-msgstr "Calificaciones"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_professor__image_1920
-#: model:ir.model.fields,field_description:university.field_university_student__image_1920
-#: model:ir.model.fields,field_description:university.field_university_university__image_1920
-msgid "Image"
-msgstr "Imagen"
-
-#. module: university
-#: model:ir.model.fields,field_description:university.field_university_department__name
-#: model:ir.model.fields,field_description:university.field_university_professor__name
-#: model:ir.model.fields,field_description:university.field_university_student__name
-#: model:ir.model.fields,field_description:university.field_university_subject__name
-#: model:ir.model.fields,field_description:university.field_university_
-#: model:ir.model.fields,field_description:university.field_university_university__name
-msgid "Name"
-msgstr "Nombre"
-
-#. module: university
 #: model:ir.model,name:university.model_university_professor
-#: model:ir.ui.menu,name:university.menu_university_professors
 msgid "Professor"
 msgstr "Profesor"
 
 #. module: university
 #: model:ir.model,name:university.model_university_student
-#: model:ir.ui.menu,name:university.menu_university_students
 msgid "Student"
 msgstr "Estudiante"
 
@@ -154,13 +64,139 @@ msgid "Subject"
 msgstr "Asignatura"
 
 #. module: university
-#: model:ir.model,name:university.model_university_university
-#: model:ir.ui.menu,name:university.menu_university_root
+#: model:ir.model,name:university.model_university_enrollment
+#: model:ir.ui.menu,name:university.menu_university_enrollments
+msgid "Enrollment"
+msgstr "Matrícula"
+
+#. module: university
+#: model:ir.model,name:university.model_university_grade
+msgid "Grade"
+msgstr "Calificación"
+
+#. module: university
+#: model:ir.ui.menu,name:university.menu_university_universities
+msgid "Universities"
+msgstr "Universidades"
+
+#. module: university
+#: model:ir.ui.menu,name:university.menu_university_reports
+msgid "Reports"
+msgstr "Informes"
+
+#. module: university
+# --- Esto arregla la columna Subjects en Profesores (Tree y Kanban) ---
+#: model:ir.model.fields,field_description:university.field_university_professor__subject_ids
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_tree
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_kanban
+msgid "Subjects"
+msgstr "Asignaturas"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_professor__student_ids
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_kanban
+msgid "Students"
+msgstr "Estudiantes"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_student__enrollment_count
+#: model:ir.model.fields,field_description:university.field_university_university__enrollment_count
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_tree
+msgid "Enrollment Count"
+msgstr "Nº de Matrículas"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_grade__student_id
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_tree
+msgid "Student"
+msgstr "Estudiante"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_grade__enrollment_id
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_tree
+msgid "Enrollment"
+msgstr "Matrícula"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_university__name
+#: model:ir.model.fields,field_description:university.field_university_department__name
+#: model:ir.model.fields,field_description:university.field_university_professor__name
+#: model:ir.model.fields,field_description:university.field_university_student__name
+#: model:ir.model.fields,field_description:university.field_university_subject__name
+#: model:ir.model.fields,field_description:university.field_university_enrollment__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_department__university_id
+#: model:ir.model.fields,field_description:university.field_university_professor__university_id
+#: model:ir.model.fields,field_description:university.field_university_student__university_id
+#: model:ir.model.fields,field_description:university.field_university_subject__university_id
+#: model:ir.model.fields,field_description:university.field_university_enrollment__university_id
 msgid "University"
 msgstr "Universidad"
 
 #. module: university
-#: model:ir.model,name:university.model_university_report
-#: model:ir.ui.menu,name:university.menu_university_reports
-msgid "University Report"
-msgstr "Informe Universitario"
+#: model:ir.model.fields,field_description:university.field_university_department__manager_id
+msgid "Department Manager"
+msgstr "Responsable de Departamento"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_professor__department_id
+msgid "Department"
+msgstr "Departamento"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_enrollment__student_id
+msgid "Student"
+msgstr "Estudiante"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_enrollment__subject_id
+msgid "Subject"
+msgstr "Asignatura"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_enrollment__professor_id
+msgid "Professor"
+msgstr "Profesor"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Enrollment Count"
+msgstr "Contador de Matrículas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Linked Enrollments"
+msgstr "Matrículas Vinculadas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Linked Students"
+msgstr "Alumnos Vinculados"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Linked Teachers"
+msgstr "Profesorado Vinculado"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Linked Departments"
+msgstr "Departamentos Vinculados"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_home_menu_grades
+msgid "Notes"
+msgstr "Notas"
+
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_report__average_grade
+msgid "Average Grade"
+msgstr "Nota Media"
+
+#. module: university
+#: model:ir.actions.report,name:university.action_student_report
+msgid "Student Report"
+msgstr "Informe de Estudiante"
