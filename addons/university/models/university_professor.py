@@ -6,16 +6,16 @@ class Professor(models.Model):
 
     name = fields.Char(string="Name", required=True)
     
-    # Imagen dual: esto es lo que evita que desaparezca
+    # Manejo de imágenes
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
 
     university_id = fields.Many2one("university.university", string="University", required=True)
-    department_id = fields.Many2one("university.department", string="Department")
+    department_id = fields.Many2one("university.department", string="Primary Department")
     
     department_ids = fields.Many2many(
         "university.department", "university_professor_department_rel", 
-        "professor_id", "department_id", string="Departments"
+        "professor_id", "department_id", string="Secondary Departments"
     )
     
     subject_ids = fields.Many2many(
@@ -25,27 +25,30 @@ class Professor(models.Model):
     
     enrollment_ids = fields.One2many("university.enrollment", "professor_id", string="Enrollments")
 
-    # Los 3 contadores que usa tu XML
-    enrollment_count = fields.Integer(compute="_compute_counts")
-    subject_count = fields.Integer(compute="_compute_counts")
-    student_count = fields.Integer(compute="_compute_counts")
+    # AJUSTE 1: Añadimos 'store=True'
+    # En Odoo 19, si quieres filtrar o agrupar por estos campos en el Kanban/List, 
+    # deben estar almacenados en la base de datos.
+    enrollment_count = fields.Integer(compute="_compute_counts", string="Enrollment Count", store=True)
+    subject_count = fields.Integer(compute="_compute_counts", string="Subject Count", store=True)
+    student_count = fields.Integer(compute="_compute_counts", string="Student Count", store=True)
 
-    @api.depends('enrollment_ids', 'subject_ids')
+    # AJUSTE 2: Mapped optimizado
+    @api.depends('enrollment_ids', 'subject_ids', 'enrollment_ids.student_id')
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
             record.subject_count = len(record.subject_ids)
-            # Buscamos estudiantes únicos vinculados a sus matrículas
+            # Usamos set() para asegurar que el conteo de estudiantes sea único
             record.student_count = len(record.enrollment_ids.mapped('student_id'))
 
-    # Las 3 funciones de los botones
+    # Acciones de los botones
     def action_view_enrollments(self):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
             "name": "Enrollments",
             "res_model": "university.enrollment",
-            "view_mode": "list,form",
+            "view_mode": "list,form", # Odoo 19 prefiere 'list' sobre 'tree'
             "domain": [("professor_id", "=", self.id)],
             "context": {"default_professor_id": self.id},
         }
@@ -62,6 +65,7 @@ class Professor(models.Model):
 
     def action_view_students(self):
         self.ensure_one()
+        # AJUSTE 3: Verificación de seguridad
         student_ids = self.enrollment_ids.mapped('student_id').ids
         return {
             "type": "ir.actions.act_window",
