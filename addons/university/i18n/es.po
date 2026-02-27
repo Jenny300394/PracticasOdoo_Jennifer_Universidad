@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#     * university
+# 	* university
 #
 msgid ""
 msgstr ""
@@ -28,8 +28,8 @@ msgid "Students"
 msgstr "Estudiantes"
 
 #. module: university
-# --- Esto arregla el desplegable de Informes ---
 #: model:ir.actions.act_window,name:university.action_university_report
+#: model:ir.actions.report,name:university.action_university_report_print
 #: model:ir.model,name:university.model_university_report
 #: model:ir.ui.menu,name:university.menu_university_reports
 msgid "University Report"
@@ -85,7 +85,6 @@ msgid "Reports"
 msgstr "Informes"
 
 #. module: university
-# --- Esto arregla la columna Subjects en Profesores (Tree y Kanban) ---
 #: model:ir.model.fields,field_description:university.field_university_professor__subject_ids
 #: model_terms:ir.ui.view,arch_db:university.view_university_professor_tree
 #: model_terms:ir.ui.view,arch_db:university.view_university_professor_kanban
@@ -94,6 +93,8 @@ msgstr "Asignaturas"
 
 #. module: university
 #: model:ir.model.fields,field_description:university.field_university_professor__student_ids
+#: model:ir.model.fields,field_description:university.field_university_professor__student_count
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_tree
 #: model_terms:ir.ui.view,arch_db:university.view_university_professor_kanban
 msgid "Students"
 msgstr "Estudiantes"
