@@ -1,42 +1,58 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class Professor(models.Model):
     _name = "university.professor"
     _description = "Professor"
 
+    # --- CAMBIO 1: El email ahora es obligatorio ---
     name = fields.Char(string="Name", required=True)
+    email = fields.Char(string="Email", required=True) # <--- Añadido required=True
     
-    # Manejo de imágenes (Se mantiene igual)
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
 
-    # RELACIÓN PADRE: Aquí SÍ ponemos el cascade
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
         required=True,
-        ondelete='cascade'  # Si la universidad se borra, el profesor también
+        ondelete='cascade'
     )
-    
-    # Relación con el departamento: NO ponemos cascade. 
-    # Si borras un departamento, no queremos que el profesor muera.
+
+    # --- CAMBIO 2: Quitamos 'name_unique' ---
+    # Así permitimos que dos personas se llamen igual si tienen emails distintos.
+    _sql_constraints = [
+        ('email_unique', 'unique(email)', '¡Error! Este email ya pertenece a un profesor en el sistema.'),
+    ]
+
+    @api.constrains('email')
+    def _check_unique_professor_globally(self):
+        for record in self:
+            # --- CAMBIO 3: Usamos .sudo() ---
+            # Esto es lo que permite buscar en todas las universidades a la vez.
+            existing = self.sudo().search([
+                ('id', '!=', record.id),
+                ('email', '=', record.email)
+            ], limit=1)
+            
+            if existing:
+                raise ValidationError(
+                    f"¡Detección de duplicado! El profesor con email {record.email} "
+                    f"ya está registrado en la universidad: {existing.university_id.name}."
+                )
+
+    # El resto de tu código (Relaciones, Contadores y Acciones) se queda EXACTAMENTE IGUAL
     department_id = fields.Many2one("university.department", string="Primary Department")
-    
-    # Many2many: NO llevan ondelete (Odoo limpia la tabla relacional automáticamente)
     department_ids = fields.Many2many(
         "university.department", "university_professor_department_rel", 
         "professor_id", "department_id", string="Secondary Departments"
     )
-    
     subject_ids = fields.Many2many(
         "university.subject", "university_professor_subject_rel", 
         "professor_id", "subject_id", string="Subjects"
     )
-    
-    # One2many: NUNCA poner ondelete aquí (Esto es lo que rompe el servidor)
     enrollment_ids = fields.One2many("university.enrollment", "professor_id", string="Enrollments")
 
-    # --- El resto de tus métodos (Counts y Actions) se mantienen exactamente igual ---
     enrollment_count = fields.Integer(compute="_compute_counts", string="Enrollment Count", store=True)
     subject_count = fields.Integer(compute="_compute_counts", string="Subject Count", store=True)
     student_count = fields.Integer(compute="_compute_counts", string="Student Count", store=True)

@@ -216,56 +216,59 @@
 </record>
 <!-- FORM VIEW -->
 <record id="view_university_professor_form" model="ir.ui.view">
-        <field name="name">university.professor.form</field>
-        <field name="model">university.professor</field>
-        <field name="arch" type="xml">
-            <form string="Professor">
-                <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_subjects" type="object" class="oe_stat_button" icon="fa-book">
-                            <field name="subject_count" widget="statinfo" string="Subjects"/>
-                        </button>
-                        <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
-                            <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
-                        </button>
-                        <button name="action_view_students" type="object" class="oe_stat_button" icon="fa-users">
-                            <field name="student_count" widget="statinfo" string="Students"/>
-                        </button>
-                    </div>
+    <field name="name">university.professor.form</field>
+    <field name="model">university.professor</field>
+    <field name="arch" type="xml">
+        <form string="Professor">
+            <sheet>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_subjects" type="object" class="oe_stat_button" icon="fa-book">
+                        <field name="subject_count" widget="statinfo" string="Subjects"/>
+                    </button>
+                    <button name="action_view_enrollments" type="object" class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="enrollment_count" widget="statinfo" string="Enrollments"/>
+                    </button>
+                    <button name="action_view_students" type="object" class="oe_stat_button" icon="fa-users">
+                        <field name="student_count" widget="statinfo" string="Students"/>
+                    </button>
+                </div>
 
-                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
 
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1><field name="name" placeholder="Ej. Dr. Smith"/></h1>
-                    </div>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1><field name="name" placeholder="Ej. Dr. Smith"/></h1>
+                </div>
 
-                    <group>
-                        <group string="Institution Info">
-                            <field name="university_id"/>
-                            <field name="department_id" string="Main Department"/>
-                        </group>
-                        <group string="Assignments">
-                            <field name="department_ids" widget="many2many_tags" placeholder="Secondary departments..."/>
-                            <field name="subject_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                        </group>
+                <group>
+                    <group string="Contact Info">
+                        <field name="email" widget="email" placeholder="email@university.com"/>
                     </group>
+                    <group string="Institution Info">
+                        <field name="university_id"/>
+                        <field name="department_id" string="Main Department"/>
+                    </group>
+                </group>
 
-                    <notebook>
-                        <page string="Current Enrollments" name="enrollments">
-                            <field name="enrollment_ids">
-                                <list editable="bottom">
-                                    <field name="student_id"/>
-                                    <field name="subject_id"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
+                <group string="Assignments">
+                    <field name="department_ids" widget="many2many_tags" placeholder="Secondary departments..."/>
+                    <field name="subject_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+
+                <notebook>
+                    <page string="Current Enrollments" name="enrollments">
+                        <field name="enrollment_ids">
+                            <list editable="bottom">
+                                <field name="student_id"/>
+                                <field name="subject_id"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+    </field>
 </record>
-
 <!-- KANBAN VIEW -->
 <record id="view_university_professor_kanban" model="ir.ui.view">
         <field name="name">university.professor.kanban</field>
@@ -415,8 +418,7 @@
             </list>
         </field>
 </record>
-<!-- FORM VIEW -->
- <record id="view_university_student_form" model="ir.ui.view">
+<record id="view_university_student_form" model="ir.ui.view">
     <field name="name">university.student.form</field>
     <field name="model">university.student</field>
     <field name="arch" type="xml">
@@ -449,7 +451,18 @@
                 </div>
 
                 <group>
-                    <group>
+                    <group string="Datos Institucionales">
+                        <field name="university_id" 
+                               required="1" 
+                               readonly="0" 
+                               options="{'no_create': True, 'no_open': True}"/>
+                        
+                        <field name="tutor_id" 
+                               domain="[('university_id', '=', university_id)]" 
+                               options="{'no_create': True}"/>
+                    </group>
+                    
+                    <group string="Contacto">
                         <field name="partner_id" string="Related Contact"/>
                         <field name="user_id" string="Related User" readonly="1"/> 
                         
@@ -463,24 +476,27 @@
                                     title="Enviar resumen rápido"
                                     invisible="not email"/>
                         </div>
-                        <field name="university_id"/>
-                        <field name="tutor_id"/>
                     </group>
                 </group>
 
                 <notebook>
                     <page string="Enrollments">
-                        <field name="enrollment_ids">
+                        <field name="enrollment_ids" context="{'default_university_id': university_id}">
                             <list editable="bottom">
-                                <field name="subject_id"/>
-                                <field name="professor_id"/>
+                                <field name="subject_id" 
+                                       domain="[('university_id', '=', parent.university_id)]" 
+                                       options="{'no_create': True}"/>
+                                <field name="professor_id" 
+                                       domain="[('university_id', '=', parent.university_id)]" 
+                                       options="{'no_create': True}"/>
+                                <field name="university_id" invisible="1" force_save="1"/>
                             </list>
                         </field>
                     </page>
                     <page string="Grades">
                         <field name="grade_ids">
                             <list editable="bottom">
-                                <field name="enrollment_id"/>
+                                <field name="enrollment_id" domain="[('student_id', '=', parent.id)]" options="{'no_create': True}"/>
                                 <field name="grade"/>
                             </list>
                         </field>
@@ -569,13 +585,24 @@
                 </div>
 
                 <group>
-                    <group string="Información del Estudiante">
-                        <field name="student_id" options="{'no_create': True}"/>
-                        <field name="university_id"/>
+                    <group string="Institución y Alumno">
+                        <field name="university_id" required="1" options="{'no_create': True}"/>
+                        
+                        <field name="student_id" 
+                               options="{'no_create': True}" 
+                               domain="[('university_id', '=', university_id)]"
+                               required="1"/>
                     </group>
+                    
                     <group string="Asignación Académica">
-                        <field name="subject_id" options="{'no_create': True}"/>
-                        <field name="professor_id"/>
+                        <field name="subject_id" 
+                               options="{'no_create': True}"
+                               domain="[('university_id', '=', university_id)]"
+                               required="1"/>
+                        
+                        <field name="professor_id" 
+                               options="{'no_create': True}"
+                               domain="[('university_id', '=', university_id)]"/>
                     </group>
                 </group>
 
@@ -588,7 +615,6 @@
                         </field>
                     </page>
                 </notebook>
-
             </sheet>
         </form>
     </field>
@@ -668,8 +694,12 @@
 
                 <group>
                     <group string="Datos de la Nota">
-                        <field name="student_id" options="{'no_create': True}"/>
-                        <field name="enrollment_id" options="{'no_create': True}"/>
+                        <field name="student_id" options="{'no_create': True}" required="1"/>
+                        
+                        <field name="enrollment_id" 
+                               options="{'no_create': True}" 
+                               required="1"
+                               domain="[('student_id', '=', student_id)]"/>
                     </group>
                 </group>
             </sheet>

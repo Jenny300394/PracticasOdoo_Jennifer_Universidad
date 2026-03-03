@@ -7,8 +7,7 @@ class Enrollment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string="Enrollment Code", readonly=True, copy=False, tracking=True)
-    
-    # Estos siguen siendo CASCADE porque si muere el alumno o la uni, la matrícula no tiene sentido.
+
     student_id = fields.Many2one(
         "university.student", 
         string="Student", 
@@ -22,32 +21,28 @@ class Enrollment(models.Model):
         ondelete='cascade'
     )
     
-    # --- EL CAMBIO CLAVE ESTÁ AQUÍ ---
-    # 1. Quitamos required=True para que Odoo permita dejarlo vacío.
-    # 2. Ponemos ondelete='set null' para que la matrícula sobreviva al borrado del profesor.
     professor_id = fields.Many2one(
         "university.professor", 
         string="Professor", 
-        required=False,  # <--- ESENCIAL: Si es True, Odoo no permite dejarlo vacío.
+        required=False, 
         tracking=True,
-        ondelete='set null' # <--- Si borras al profe, el campo queda vacío pero la matrícula sigue viva.
+        ondelete='set null' 
     )
     
     subject_id = fields.Many2one(
         "university.subject", 
         string="Subject", 
         required=True,
-        ondelete='restrict' # <--- Mejor 'restrict' para que no borren la materia si hay alumnos dentro.
+        ondelete='restrict' 
     )
     
     grade_ids = fields.One2many("university.grade", "enrollment_id", string="Grades")
 
-    # --- El resto del código se mantiene igual ---
     grade_count = fields.Integer(compute='_compute_grade_count')
 
     def _compute_grade_count(self):
         for record in self:
-            record.enrollment_count = len(record.enrollment_ids) # Corregido para que coincida con el campo
+            record.enrollment_count = len(record.enrollment_ids) 
 
     def action_view_grades(self):
         return {
@@ -61,7 +56,6 @@ class Enrollment(models.Model):
 
     @api.model
     def create(self, vals):
-        # Mantenemos tu lógica de secuencia...
         record = super().create(vals)
         subject = record.subject_id
         year = fields.Date.today().year

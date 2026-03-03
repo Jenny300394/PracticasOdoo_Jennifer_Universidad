@@ -1,6 +1,6 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-# 	* university
+#      * university
 #
 msgid ""
 msgstr ""
@@ -201,3 +201,76 @@ msgstr "Nota Media"
 #: model:ir.actions.report,name:university.action_student_report
 msgid "Student Report"
 msgstr "Informe de Estudiante"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Send by Email"
+msgstr "Enviar por Email"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Print PDF"
+msgstr "Imprimir PDF"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Enrollments"
+msgstr "Matrículas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Grades"
+msgstr "Notas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Professors"
+msgstr "Profesores"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Subjects"
+msgstr "Asignaturas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Datos Institucionales"
+msgstr "Datos Institucionales"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_student_form
+msgid "Contacto"
+msgstr "Contacto"
+
+# --- NUEVAS TRADUCCIONES PARA SMART BUTTONS EN OTROS MODELOS ---
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_subject_form
+msgid "Enrollments"
+msgstr "Matrículas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_subject_form
+msgid "Professors"
+msgstr "Profesores"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_subject_form
+msgid "Students"
+msgstr "Estudiantes"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_professor_form
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Subjects"
+msgstr "Asignaturas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_university_form
+msgid "Departments"
+msgstr "Departamentos"

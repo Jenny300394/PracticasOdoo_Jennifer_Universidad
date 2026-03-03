@@ -1,10 +1,35 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class University(models.Model):
     _name = "university.university"
     _description = "University"
 
-    # BASIC FIELDS
+    # --- DOBLE CANDADO DE SEGURIDAD ---
+    
+    # 1. Bloqueo en Base de Datos (SQL)
+    _sql_constraints = [
+        ('name_university_unique', 
+         'unique(name)', 
+         '¡Error! Ya existe una universidad registrada con este nombre.')
+    ]
+
+    # 2. Bloqueo en Python (Por si el SQL falla al actualizar)
+    @api.constrains('name')
+    def _check_unique_university_name(self):
+        for record in self:
+            # Buscamos si existe otra uni con el mismo nombre (ignorando mayúsculas/minúsculas)
+            existing = self.search([
+                ('id', '!=', record.id),
+                ('name', '=ilike', record.name)
+            ], limit=1)
+            if existing:
+                raise ValidationError(
+                    f"¡Acción Bloqueada! Ya existe una institución llamada '{record.name}'. "
+                    "No se permiten nombres duplicados."
+                )
+
+    # --- CAMPOS BÁSICOS ---
     name = fields.Char(string="Name", required=True)
     
     # MANEJO DE IMÁGENES
@@ -17,14 +42,13 @@ class University(models.Model):
     zip = fields.Char(string="ZIP")
     country_id = fields.Many2one("res.country", string="Country")
 
-    # --- CAMBIO AQUÍ PARA EL BORRADO ---
     director_id = fields.Many2one(
         "university.professor",
         string="Director",
-        ondelete='set null', # <--- Si el profesor se borra, la Uni se queda sin director pero NO se borra.
+        ondelete='set null',
     )
 
-    # RELATIONS + COUNTERS
+    # --- RELACIONES + CONTADORES ---
     enrollment_ids = fields.One2many("university.enrollment", "university_id", string="Enrollments")
     enrollment_count = fields.Integer(string="Enrollments Count", compute="_compute_counts", store=True)
 
@@ -45,7 +69,8 @@ class University(models.Model):
             record.professor_count = len(record.professor_ids)
             record.department_count = len(record.department_ids)
 
-    # SMARTBUTTON ACTIONS
+    # --- ACCIONES DE SMART BUTTONS ---
+
     def action_view_students(self):
         self.ensure_one()
         return {

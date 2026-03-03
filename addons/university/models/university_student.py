@@ -1,46 +1,72 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class Student(models.Model):
     _name = "university.student"
     _description = "Student"
 
-    # --- Campos principales ---
+    # --- CAMPOS PRINCIPALES ---
     name = fields.Char(string="Name", required=True)
     partner_id = fields.Many2one("res.partner", string="Related Contact")
     user_id = fields.Many2one("res.users", string="Related User", readonly=True)
-    email = fields.Char(string="Email")
     
-    # 1. USAR DOS CAMPOS DE IMAGEN (Como en Profesor y Universidad)
-    # Esto garantiza que Odoo guarde la imagen original y la miniatura para la interfaz
+    # Email obligatorio para diferenciar alumnos y para el Ejercicio 10
+    email = fields.Char(string="Email", required=True)
+    
+    # Manejo de imágenes (Ejercicio 3)
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
     
-    # 2. RELACIONES CON BORRADO LÓGICO
+    # Universidad (Ejercicio 1)
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
         required=True,
         ondelete='cascade'
     )
+
+    # --- LÓGICA DE HERENCIA DE UNIVERSIDAD (Para evitar errores de validación) ---
+    @api.onchange('university_id')
+    def _onchange_university_id(self):
+        """Asigna la universidad del alumno a sus líneas de matrícula automáticamente"""
+        for record in self:
+            for enrollment in record.enrollment_ids:
+                enrollment.university_id = record.university_id
     
     tutor_id = fields.Many2one(
         "university.professor", 
         string="Tutor",
-        ondelete='set null' # Cambiado para que el alumno no muera si el profe se va
+        ondelete='set null'
     )
 
-    # --- Dirección ---
+    # --- VALIDACIÓN PARA EVITAR DOBLE MATRÍCULA ---
+    @api.constrains('email')
+    def _check_unique_student_email(self):
+        for record in self:
+            if record.email:
+                duplicate = self.sudo().search([
+                    ('id', '!=', record.id),
+                    ('email', '=', record.email)
+                ], limit=1)
+                
+                if duplicate:
+                    raise ValidationError(
+                        f"El alumno con email '{record.email}' ya está matriculado en: "
+                        f"{duplicate.university_id.name}. No puede estar en dos universidades."
+                    )
+
+    # --- DIRECCIÓN (Ejercicio 1) ---
     street = fields.Char(string="Street")
     city = fields.Char(string="City")
     state_id = fields.Many2one("res.country.state", string="State")
     zip = fields.Char(string="ZIP")
     country_id = fields.Many2one("res.country", string="Country")
     
-    # --- Relaciones ---
+    # --- RELACIONES ---
     enrollment_ids = fields.One2many("university.enrollment", "student_id", string="Enrollments")
     grade_ids = fields.One2many("university.grade", "student_id", string="Grades")
     
-    # --- Contadores ---
+    # --- CONTADORES (Ejercicio 2) ---
     enrollment_count = fields.Integer(compute="_compute_counts")
     grade_count = fields.Integer(compute="_compute_counts")
     subject_count = fields.Integer(compute="_compute_counts")
@@ -54,8 +80,9 @@ class Student(models.Model):
             record.subject_count = len(record.enrollment_ids.mapped('subject_id'))
             record.professor_count = len(record.enrollment_ids.mapped('professor_id'))
 
-    # --- Acciones (Tus acciones originales se mantienen igual) ---
+    # --- ACCIONES DE SMART BUTTONS (Ejercicio 2) ---
     def action_view_enrollments(self):
+        self.ensure_one()
         return {
             "type": "ir.actions.act_window",
             "res_model": "university.enrollment",
@@ -65,6 +92,7 @@ class Student(models.Model):
         }
 
     def action_view_grades(self):
+        self.ensure_one()
         return {
             "type": "ir.actions.act_window",
             "res_model": "university.grade",
@@ -74,6 +102,7 @@ class Student(models.Model):
         }
 
     def action_view_subjects(self):
+        self.ensure_one()
         subject_ids = self.enrollment_ids.mapped('subject_id').ids
         return {
             "type": "ir.actions.act_window",
@@ -84,6 +113,7 @@ class Student(models.Model):
         }
 
     def action_view_professors(self):
+        self.ensure_one()
         professor_ids = self.enrollment_ids.mapped('professor_id').ids
         return {
             "type": "ir.actions.act_window",
@@ -93,6 +123,7 @@ class Student(models.Model):
             "name": "Professors",
         }
 
+    # --- ENVÍO DE EMAIL (Ejercicio 6 y 10) ---
     def action_send_report_email(self):
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
@@ -108,6 +139,7 @@ class Student(models.Model):
             }
         }
 
+    # WIDGET JS (Ejercicio 10)
     def action_send_grades_summary_js(self):
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)

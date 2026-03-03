@@ -20,7 +20,7 @@ class Department(models.Model):
         "university.professor",
         string="Department Manager",
         tracking=True,
-        ondelete='set null', # <--- CAMBIO CLAVE: Permite borrar al profesor
+        ondelete='set null', 
     )
 
     professor_ids = fields.One2many(
@@ -29,7 +29,6 @@ class Department(models.Model):
         string="Professors",
     )
 
-    # --- El resto del código se queda igual ---
     professor_count = fields.Integer(
         string="Professors Count",
         compute="_compute_professor_count",
