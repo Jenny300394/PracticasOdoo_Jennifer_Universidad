@@ -240,12 +240,20 @@
                     </group>
                     <group string="Institution Info">
                         <field name="university_id"/>
-                        <field name="department_id" string="Main Department"/>
+                        
+                        <field name="department_id" 
+                               string="Main Department" 
+                               domain="[('university_id', '=', university_id)]"
+                               options="{'no_create': True}"/>
                     </group>
                 </group>
 
                 <group string="Assignments">
-                    <field name="department_ids" widget="many2many_tags" placeholder="Secondary departments..."/>
+                    <field name="department_ids" 
+                           widget="many2many_tags" 
+                           placeholder="Secondary departments..."
+                           domain="[('university_id', '=', university_id)]"/>
+                    
                     <field name="subject_ids" widget="many2many_tags" options="{'no_create': True}"/>
                 </group>
 
