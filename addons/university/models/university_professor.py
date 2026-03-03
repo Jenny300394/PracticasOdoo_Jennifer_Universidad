@@ -6,13 +6,23 @@ class Professor(models.Model):
 
     name = fields.Char(string="Name", required=True)
     
-    # Manejo de imágenes
+    # Manejo de imágenes (Se mantiene igual)
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
 
-    university_id = fields.Many2one("university.university", string="University", required=True)
+    # RELACIÓN PADRE: Aquí SÍ ponemos el cascade
+    university_id = fields.Many2one(
+        "university.university", 
+        string="University", 
+        required=True,
+        ondelete='cascade'  # Si la universidad se borra, el profesor también
+    )
+    
+    # Relación con el departamento: NO ponemos cascade. 
+    # Si borras un departamento, no queremos que el profesor muera.
     department_id = fields.Many2one("university.department", string="Primary Department")
     
+    # Many2many: NO llevan ondelete (Odoo limpia la tabla relacional automáticamente)
     department_ids = fields.Many2many(
         "university.department", "university_professor_department_rel", 
         "professor_id", "department_id", string="Secondary Departments"
@@ -23,32 +33,28 @@ class Professor(models.Model):
         "professor_id", "subject_id", string="Subjects"
     )
     
+    # One2many: NUNCA poner ondelete aquí (Esto es lo que rompe el servidor)
     enrollment_ids = fields.One2many("university.enrollment", "professor_id", string="Enrollments")
 
-    # AJUSTE 1: Añadimos 'store=True'
-    # En Odoo 19, si quieres filtrar o agrupar por estos campos en el Kanban/List, 
-    # deben estar almacenados en la base de datos.
+    # --- El resto de tus métodos (Counts y Actions) se mantienen exactamente igual ---
     enrollment_count = fields.Integer(compute="_compute_counts", string="Enrollment Count", store=True)
     subject_count = fields.Integer(compute="_compute_counts", string="Subject Count", store=True)
     student_count = fields.Integer(compute="_compute_counts", string="Student Count", store=True)
 
-    # AJUSTE 2: Mapped optimizado
     @api.depends('enrollment_ids', 'subject_ids', 'enrollment_ids.student_id')
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
             record.subject_count = len(record.subject_ids)
-            # Usamos set() para asegurar que el conteo de estudiantes sea único
             record.student_count = len(record.enrollment_ids.mapped('student_id'))
 
-    # Acciones de los botones
     def action_view_enrollments(self):
         self.ensure_one()
         return {
             "type": "ir.actions.act_window",
             "name": "Enrollments",
             "res_model": "university.enrollment",
-            "view_mode": "list,form", # Odoo 19 prefiere 'list' sobre 'tree'
+            "view_mode": "list,form",
             "domain": [("professor_id", "=", self.id)],
             "context": {"default_professor_id": self.id},
         }
@@ -65,7 +71,6 @@ class Professor(models.Model):
 
     def action_view_students(self):
         self.ensure_one()
-        # AJUSTE 3: Verificación de seguridad
         student_ids = self.enrollment_ids.mapped('student_id').ids
         return {
             "type": "ir.actions.act_window",

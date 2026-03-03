@@ -5,9 +5,16 @@ class Subject(models.Model):
     _description = "Subject"
 
     name = fields.Char(string="Name", required=True)
-    university_id = fields.Many2one("university.university", string="University", required=True)
+    
+    # ÚNICO SITIO CON CASCADE: La asignatura pertenece a la institución.
+    university_id = fields.Many2one(
+        "university.university", 
+        string="University", 
+        required=True,
+        ondelete='cascade'
+    )
 
-    # Relaciones
+    # RELACIONES (Aquí NO se toca el ondelete)
     professor_ids = fields.Many2many(
         "university.professor",
         "university_professor_subject_rel",
@@ -15,9 +22,10 @@ class Subject(models.Model):
         "professor_id",
         string="Professors",
     )
+    # One2many: Jamás poner ondelete aquí, es lo que rompe el sistema.
     enrollment_ids = fields.One2many("university.enrollment", "subject_id", string="Enrollments")
 
-    # Contadores para Smart Buttons
+    # --- El resto de tu lógica de contadores y acciones se mantiene igual ---
     enrollment_count = fields.Integer(string="Enrollments", compute="_compute_counts")
     student_count = fields.Integer(string="Students", compute="_compute_counts")
     professor_count = fields.Integer(string="Professors Count", compute="_compute_counts")
@@ -26,11 +34,9 @@ class Subject(models.Model):
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
-            # Alumnos únicos: usamos set() o mapped().ids para contar IDs reales
             record.student_count = len(record.enrollment_ids.mapped('student_id'))
             record.professor_count = len(record.professor_ids)
 
-    # Acción del botón de matrículas
     def action_view_enrollments(self):
         self.ensure_one()
         return {
@@ -42,7 +48,6 @@ class Subject(models.Model):
             "context": {"default_subject_id": self.id},
         }
 
-    # Acción del botón de alumnos
     def action_view_students(self):
         self.ensure_one()
         student_ids = self.enrollment_ids.mapped('student_id').ids
@@ -51,11 +56,9 @@ class Subject(models.Model):
             "name": "Students",
             "res_model": "university.student",
             "view_mode": "list,kanban,form",
-            # Filtramos por los IDs de estudiantes encontrados o pasamos 0 para lista vacía
             "domain": [("id", "in", student_ids or [0])],
         }
 
-    # Acción del botón de profesores (Por si lo usas en el XML)
     def action_view_professors(self):
         self.ensure_one()
         return {

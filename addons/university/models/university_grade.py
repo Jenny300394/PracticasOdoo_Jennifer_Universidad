@@ -5,8 +5,20 @@ class Grade(models.Model):
     _description = "Grade"
     _rec_name = "display_name"
 
-    student_id = fields.Many2one("university.student", string="Student", required=True)
-    enrollment_id = fields.Many2one("university.enrollment", string="Enrollment", required=True)
+    # RELACIONES MANY2ONE CON CASCADE
+    student_id = fields.Many2one(
+        "university.student", 
+        string="Student", 
+        required=True,
+        ondelete='cascade'  # Si borras al estudiante, se borra la nota
+    )
+    enrollment_id = fields.Many2one(
+        "university.enrollment", 
+        string="Enrollment", 
+        required=True,
+        ondelete='cascade'  # Si borras la matrícula, se borra la nota
+    )
+    
     grade = fields.Float(string="Grade", required=True)
     display_name = fields.Char(compute="_compute_display_name")
 
@@ -15,7 +27,7 @@ class Grade(models.Model):
         for record in self:
             record.display_name = f"{record.student_id.name or ''} - {record.enrollment_id.name or ''}"
 
-    # --- NUEVO PARA SMART BUTTON ---
+    # --- SMART BUTTON ---
     def action_view_enrollment(self):
         return {
             'type': 'ir.actions.act_window',
@@ -24,4 +36,3 @@ class Grade(models.Model):
             'res_id': self.enrollment_id.id,
             'target': 'current',
         }
-    # -------------------------------

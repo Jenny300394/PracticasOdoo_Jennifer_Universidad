@@ -3,23 +3,24 @@ from odoo import models, fields, api
 class Department(models.Model):
     _name = "university.department"
     _description = "Department"
-    # Añadimos herencia para el estilo Odoo (Chatter y Actividades)
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string="Name", required=True, tracking=True)
-    color = fields.Integer(string="Color Index") # Para colores en Kanban
+    color = fields.Integer(string="Color Index") 
 
     university_id = fields.Many2one(
         "university.university",
         string="University",
         required=True,
         tracking=True,
+        ondelete='cascade',
     )
 
     manager_id = fields.Many2one(
         "university.professor",
         string="Department Manager",
         tracking=True,
+        ondelete='set null', # <--- CAMBIO CLAVE: Permite borrar al profesor
     )
 
     professor_ids = fields.One2many(
@@ -28,14 +29,13 @@ class Department(models.Model):
         string="Professors",
     )
 
-    # SMARTBUTTON - Mejorado para rendimiento
+    # --- El resto del código se queda igual ---
     professor_count = fields.Integer(
         string="Professors Count",
         compute="_compute_professor_count",
     )
 
     def _compute_professor_count(self):
-        # Esta es la forma técnica más profesional de contar en Odoo
         professor_data = self.env['university.professor'].read_group(
             [('department_id', 'in', self.ids)], 
             ['department_id'], 
@@ -45,7 +45,6 @@ class Department(models.Model):
         for record in self:
             record.professor_count = mapped_data.get(record.id, 0)
 
-    # SMARTBUTTON - Acción de ventana
     def action_view_professors(self):
         self.ensure_one()
         return {

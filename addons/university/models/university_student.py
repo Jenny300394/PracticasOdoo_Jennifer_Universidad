@@ -9,9 +9,25 @@ class Student(models.Model):
     partner_id = fields.Many2one("res.partner", string="Related Contact")
     user_id = fields.Many2one("res.users", string="Related User", readonly=True)
     email = fields.Char(string="Email")
-    image_1920 = fields.Image(string="Image")
-    university_id = fields.Many2one("university.university", string="University", required=True)
-    tutor_id = fields.Many2one("university.professor", string="Tutor")
+    
+    # 1. USAR DOS CAMPOS DE IMAGEN (Como en Profesor y Universidad)
+    # Esto garantiza que Odoo guarde la imagen original y la miniatura para la interfaz
+    image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
+    image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
+    
+    # 2. RELACIONES CON BORRADO LÓGICO
+    university_id = fields.Many2one(
+        "university.university", 
+        string="University", 
+        required=True,
+        ondelete='cascade'
+    )
+    
+    tutor_id = fields.Many2one(
+        "university.professor", 
+        string="Tutor",
+        ondelete='set null' # Cambiado para que el alumno no muera si el profe se va
+    )
 
     # --- Dirección ---
     street = fields.Char(string="Street")
@@ -24,12 +40,13 @@ class Student(models.Model):
     enrollment_ids = fields.One2many("university.enrollment", "student_id", string="Enrollments")
     grade_ids = fields.One2many("university.grade", "student_id", string="Grades")
     
-    # --- Contadores para Smart Buttons ---
+    # --- Contadores ---
     enrollment_count = fields.Integer(compute="_compute_counts")
     grade_count = fields.Integer(compute="_compute_counts")
     subject_count = fields.Integer(compute="_compute_counts")
     professor_count = fields.Integer(compute="_compute_counts")
 
+    @api.depends('enrollment_ids', 'grade_ids')
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
@@ -37,7 +54,7 @@ class Student(models.Model):
             record.subject_count = len(record.enrollment_ids.mapped('subject_id'))
             record.professor_count = len(record.enrollment_ids.mapped('professor_id'))
 
-    # --- Acciones de los Smart Buttons ---
+    # --- Acciones (Tus acciones originales se mantienen igual) ---
     def action_view_enrollments(self):
         return {
             "type": "ir.actions.act_window",
@@ -76,7 +93,6 @@ class Student(models.Model):
             "name": "Professors",
         }
 
-    # --- Envío de reporte por email (Ventana emergente) ---
     def action_send_report_email(self):
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
@@ -92,14 +108,11 @@ class Student(models.Model):
             }
         }
 
-    # --- BOTÓN DE LA "i" (Quick Summary) ---
     def action_send_grades_summary_js(self):
-        """ Envía el correo directamente y notifica al usuario """
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
         if template:
             template.send_mail(self.id, force_send=True)
-            # Notificación visual de éxito en Odoo
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
