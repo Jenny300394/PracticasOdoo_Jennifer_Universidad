@@ -1,43 +1,86 @@
 <odoo>
-    <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
+
+    <template id="portal_my_home_menu_grades"
+              inherit_id="portal.portal_my_home"
+              priority="30">
+
+        <!-- Insertamos contenido dentro del bloque que contiene las entradas del portal -->
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+
+            <!-- Solo mostramos la entrada si existe al menos una calificación -->
             <t t-if="grade_count" t-call="portal.portal_docs_entry">
+
+                <!-- Título que aparecerá en el menú del portal -->
                 <t t-set="title">My Grades</t>
+
+                <!-- URL a la que llevará el enlace -->
                 <t t-set="url" t-value="'/my/grades'"/>
+
+                <!-- Contador que muestra cuántas calificaciones tiene el usuario -->
                 <t t-set="placeholder_count" t-value="'grade_count'"/>
             </t>
         </xpath>
     </template>
 
+
+    <!-- Muestra una tabla con las notas del usuario en el portal -->
     <template id="portal_my_grades_list" name="My Grades">
+
+        <!-- Usamos el layout estándar del portal para mantener el diseño -->
         <t t-call="portal.portal_layout">
+
             <h3>Your Academic Grades</h3>
+
+            <!-- Tabla donde se muestran las calificaciones -->
             <table class="table table-hover bg-white o_portal_my_doc_table">
+
+                <!-- Encabezados de la tabla -->
                 <thead>
                     <tr class="active">
                         <th>Subject</th>
-                        <th>Professor</th> <th>Date</th>      <th>Grade</th>
+                        <th>Professor</th>
+                        <th>Date</th>
+                        <th>Grade</th>
                     </tr>
                 </thead>
+
+                <!-- Cuerpo de la tabla: recorremos cada calificación -->
                 <tbody>
                     <t t-foreach="grades" t-as="g">
+
                         <tr>
+
+                            <!-- Nombre de la asignatura (si existe matrícula asociada) -->
                             <td>
-                                <span t-if="g.enrollment_id" t-field="g.enrollment_id.subject_id.name"/>
+                                <span t-if="g.enrollment_id"
+                                      t-field="g.enrollment_id.subject_id.name"/>
                             </td>
+
+                            <!-- Nombre del profesor -->
                             <td>
-                                <span t-if="g.enrollment_id" t-field="g.enrollment_id.professor_id.name"/>
+                                <span t-if="g.enrollment_id"
+                                      t-field="g.enrollment_id.professor_id.name"/>
                             </td>
+
+                            <!-- Fecha de creación del registro, formateada como fecha -->
                             <td>
-                                <span t-field="g.create_date" t-options='{"widget": "date"}'/>
+                                <span t-field="g.create_date"
+                                      t-options='{"widget": "date"}'/>
                             </td>
+
+                            <!-- Nota obtenida -->
                             <td>
-                                <span t-field="g.grade" class="badge rounded-pill bg-info"/>
+                                <span t-field="g.grade"
+                                      class="badge rounded-pill bg-info"/>
                             </td>
+
                         </tr>
+
                     </t>
                 </tbody>
+
             </table>
         </t>
     </template>
+
 </odoo>

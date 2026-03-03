@@ -5,13 +5,15 @@ class Professor(models.Model):
     _name = "university.professor"
     _description = "Professor"
 
-    # --- CAMBIO 1: El email ahora es obligatorio ---
+    # El nombre y el email son obligatorios para poder registrar al profesor
     name = fields.Char(string="Name", required=True)
-    email = fields.Char(string="Email", required=True) # <--- Añadido required=True
+    email = fields.Char(string="Email", required=True)
     
+    # Campos para las fotos
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
 
+    # Universidad a la que pertenece el profesor
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
@@ -19,17 +21,16 @@ class Professor(models.Model):
         ondelete='cascade'
     )
 
-    # --- CAMBIO 2: Quitamos 'name_unique' ---
-    # Así permitimos que dos personas se llamen igual si tienen emails distintos.
+    # Restricción SQL para que no se repitan los emails en la base de datos
     _sql_constraints = [
         ('email_unique', 'unique(email)', '¡Error! Este email ya pertenece a un profesor en el sistema.'),
     ]
 
+    # Validación extra para avisar si el profesor ya existe en otra universidad
     @api.constrains('email')
     def _check_unique_professor_globally(self):
         for record in self:
-            # --- CAMBIO 3: Usamos .sudo() ---
-            # Esto es lo que permite buscar en todas las universidades a la vez.
+            # Usamos .sudo() para que Odoo busque en todas las universidades, no solo en la actual
             existing = self.sudo().search([
                 ('id', '!=', record.id),
                 ('email', '=', record.email)
@@ -41,7 +42,7 @@ class Professor(models.Model):
                     f"ya está registrado en la universidad: {existing.university_id.name}."
                 )
 
-    # El resto de tu código (Relaciones, Contadores y Acciones) se queda EXACTAMENTE IGUAL
+    # Relaciones con departamentos y asignaturas (usamos Many2many)
     department_id = fields.Many2one("university.department", string="Primary Department")
     department_ids = fields.Many2many(
         "university.department", "university_professor_department_rel", 
@@ -53,17 +54,21 @@ class Professor(models.Model):
     )
     enrollment_ids = fields.One2many("university.enrollment", "professor_id", string="Enrollments")
 
+    # Campos para contar matrículas, asignaturas y alumnos
     enrollment_count = fields.Integer(compute="_compute_counts", string="Enrollment Count", store=True)
     subject_count = fields.Integer(compute="_compute_counts", string="Subject Count", store=True)
     student_count = fields.Integer(compute="_compute_counts", string="Student Count", store=True)
 
+    # Función que hace los cálculos de los contadores
     @api.depends('enrollment_ids', 'subject_ids', 'enrollment_ids.student_id')
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
             record.subject_count = len(record.subject_ids)
+            # Con mapped sacamos los alumnos únicos de todas sus matrículas
             record.student_count = len(record.enrollment_ids.mapped('student_id'))
 
+    # Botón para ver las matrículas de este profesor
     def action_view_enrollments(self):
         self.ensure_one()
         return {
@@ -75,6 +80,7 @@ class Professor(models.Model):
             "context": {"default_professor_id": self.id},
         }
 
+    # Botón para ver las asignaturas que imparte
     def action_view_subjects(self):
         self.ensure_one()
         return {
@@ -85,6 +91,7 @@ class Professor(models.Model):
             "domain": [("id", "in", self.subject_ids.ids)],
         }
 
+    # Botón para ver la lista de sus alumnos
     def action_view_students(self):
         self.ensure_one()
         student_ids = self.enrollment_ids.mapped('student_id').ids

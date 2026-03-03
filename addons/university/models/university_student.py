@@ -5,19 +5,20 @@ class Student(models.Model):
     _name = "university.student"
     _description = "Student"
 
-    # --- CAMPOS PRINCIPALES ---
+    # Campos básicos del alumno
     name = fields.Char(string="Name", required=True)
+    # Relación con el contacto y el usuario del sistema
     partner_id = fields.Many2one("res.partner", string="Related Contact")
     user_id = fields.Many2one("res.users", string="Related User", readonly=True)
     
-    # Email obligatorio para diferenciar alumnos y para el Ejercicio 10
+    # Ponemos el email obligatorio para que no haya fallos al enviar los informes
     email = fields.Char(string="Email", required=True)
     
-    # Manejo de imágenes (Ejercicio 3)
+    # Las fotos del alumno, una grande y la otra pequeñita que se rellena sola
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
     
-    # Universidad (Ejercicio 1)
+    # A qué universidad pertenece (si se borra la uni, se borra el alumno con cascade)
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
@@ -25,10 +26,9 @@ class Student(models.Model):
         ondelete='cascade'
     )
 
-    # --- LÓGICA DE HERENCIA DE UNIVERSIDAD (Para evitar errores de validación) ---
+    # Si cambiamos la uni del alumno, se la cambiamos también a sus matrículas automáticamente
     @api.onchange('university_id')
     def _onchange_university_id(self):
-        """Asigna la universidad del alumno a sus líneas de matrícula automáticamente"""
         for record in self:
             for enrollment in record.enrollment_ids:
                 enrollment.university_id = record.university_id
@@ -39,11 +39,12 @@ class Student(models.Model):
         ondelete='set null'
     )
 
-    # --- VALIDACIÓN PARA EVITAR DOBLE MATRÍCULA ---
+    # Validación para que un alumno no use un email que ya existe en otra universidad
     @api.constrains('email')
     def _check_unique_student_email(self):
         for record in self:
             if record.email:
+                # El sudo() sirve para buscar en toda la base de datos sin restricciones
                 duplicate = self.sudo().search([
                     ('id', '!=', record.id),
                     ('email', '=', record.email)
@@ -55,23 +56,24 @@ class Student(models.Model):
                         f"{duplicate.university_id.name}. No puede estar en dos universidades."
                     )
 
-    # --- DIRECCIÓN (Ejercicio 1) ---
+    # Campos para la dirección del alumno
     street = fields.Char(string="Street")
     city = fields.Char(string="City")
     state_id = fields.Many2one("res.country.state", string="State")
     zip = fields.Char(string="ZIP")
     country_id = fields.Many2one("res.country", string="Country")
     
-    # --- RELACIONES ---
+    # Relaciones One2many para ver sus matrículas y sus notas
     enrollment_ids = fields.One2many("university.enrollment", "student_id", string="Enrollments")
     grade_ids = fields.One2many("university.grade", "student_id", string="Grades")
     
-    # --- CONTADORES (Ejercicio 2) ---
+    # Campos que calculan los números que salen en los botones de arriba
     enrollment_count = fields.Integer(compute="_compute_counts")
     grade_count = fields.Integer(compute="_compute_counts")
     subject_count = fields.Integer(compute="_compute_counts")
     professor_count = fields.Integer(compute="_compute_counts")
 
+    # Función para contar todo: usamos mapped para no repetir profesores ni asignaturas
     @api.depends('enrollment_ids', 'grade_ids')
     def _compute_counts(self):
         for record in self:
@@ -80,7 +82,7 @@ class Student(models.Model):
             record.subject_count = len(record.enrollment_ids.mapped('subject_id'))
             record.professor_count = len(record.enrollment_ids.mapped('professor_id'))
 
-    # --- ACCIONES DE SMART BUTTONS (Ejercicio 2) ---
+    # Acción para abrir la lista de matrículas de este alumno
     def action_view_enrollments(self):
         self.ensure_one()
         return {
@@ -91,6 +93,7 @@ class Student(models.Model):
             "name": "Enrollments",
         }
 
+    # Acción para abrir sus notas
     def action_view_grades(self):
         self.ensure_one()
         return {
@@ -101,6 +104,7 @@ class Student(models.Model):
             "name": "Grades",
         }
 
+    # Acción para ver las asignaturas donde está apuntado
     def action_view_subjects(self):
         self.ensure_one()
         subject_ids = self.enrollment_ids.mapped('subject_id').ids
@@ -112,6 +116,7 @@ class Student(models.Model):
             "name": "Subjects",
         }
 
+    # Acción para ver sus profesores
     def action_view_professors(self):
         self.ensure_one()
         professor_ids = self.enrollment_ids.mapped('professor_id').ids
@@ -123,9 +128,10 @@ class Student(models.Model):
             "name": "Professors",
         }
 
-    # --- ENVÍO DE EMAIL (Ejercicio 6 y 10) ---
+    # Esta función abre la ventana para enviar el informe por email
     def action_send_report_email(self):
         self.ensure_one()
+        # Buscamos la plantilla que creamos en XML
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
@@ -139,7 +145,7 @@ class Student(models.Model):
             }
         }
 
-    # WIDGET JS (Ejercicio 10)
+    # Envío rápido con notificación de éxito (usando JS de Odoo)
     def action_send_grades_summary_js(self):
         self.ensure_one()
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)

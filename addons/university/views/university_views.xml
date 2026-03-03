@@ -1,10 +1,8 @@
 <odoo>
 
-<!-- ========================= -->
-<!--        UNIVERSITY         -->
-<!-- ========================= -->
+<!-- Universidad -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_university_tree" model="ir.ui.view">
         <field name="name">university.university.tree</field>
         <field name="model">university.university</field>
@@ -18,7 +16,7 @@
         </field>
 </record>
 
-<!-- FORM VIEW -->
+<!-- Vista formulario -->
 <record id="view_university_university_form" model="ir.ui.view">
         <field name="name">university.university.form</field>
         <field name="model">university.university</field>
@@ -71,7 +69,7 @@
             </form>
         </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban-->
 <record id="view_university_university_kanban" model="ir.ui.view">
     <field name="name">university.university.kanban</field>
     <field name="model">university.university</field>
@@ -105,11 +103,9 @@
         </kanban>
     </field>
 </record>
-<!-- ========================= -->
-<!--        DEPARTMENT         -->
-<!-- ========================= -->
+<!-- Departamento -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_department_tree" model="ir.ui.view">
     <field name="name">university.department.tree</field>
     <field name="model">university.department</field>
@@ -122,7 +118,7 @@
     </field>
 </record>
 
-<!-- FORM VIEW -->
+<!-- Vista formulario -->
 <record id="view_university_department_form" model="ir.ui.view">
     <field name="name">university.department.form</field>
     <field name="model">university.department</field>
@@ -162,7 +158,7 @@
         </form>
     </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_department_kanban" model="ir.ui.view">
     <field name="name">university.department.kanban</field>
     <field name="model">university.department</field>
@@ -197,11 +193,9 @@
         </kanban>
     </field>
 </record>
-<!-- ========================= -->
-<!--         PROFESSOR         -->
-<!-- ========================= -->
+<!-- Profesor -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_professor_tree" model="ir.ui.view">
     <field name="name">university.professor.list</field>
     <field name="model">university.professor</field>
@@ -214,7 +208,7 @@
             <field name="student_count" string="Students" optional="show"/> </list>
     </field>
 </record>
-<!-- FORM VIEW -->
+<!-- Vista formulario -->
 <record id="view_university_professor_form" model="ir.ui.view">
     <field name="name">university.professor.form</field>
     <field name="model">university.professor</field>
@@ -269,7 +263,7 @@
         </form>
     </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_professor_kanban" model="ir.ui.view">
         <field name="name">university.professor.kanban</field>
         <field name="model">university.professor</field>
@@ -310,11 +304,9 @@
             </kanban>
         </field>
 </record>
-<!-- ========================= -->
-<!--          SUBJECT          -->
-<!-- ========================= -->
+<!-- Asignatura -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_subject_tree" model="ir.ui.view">
         <field name="name">university.subject.tree</field>
         <field name="model">university.subject</field>
@@ -327,7 +319,7 @@
         </field>
 </record>
 
-<!-- FORM VIEW -->
+<!-- Vista formulario -->
 <record id="view_university_subject_form" model="ir.ui.view">
     <field name="name">university.subject.form</field>
     <field name="model">university.subject</field>
@@ -374,7 +366,7 @@
         </form>
     </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_subject_kanban" model="ir.ui.view">
         <field name="name">university.subject.kanban</field>
         <field name="model">university.subject</field>
@@ -401,11 +393,9 @@
             </kanban>
         </field>
     </record>
-<!-- ========================= -->
-<!--          STUDENT          -->
-<!-- ========================= -->
+<!-- Estudiante -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_student_tree" model="ir.ui.view">
         <field name="name">university.student.tree</field>
         <field name="model">university.student</field>
@@ -418,6 +408,7 @@
             </list>
         </field>
 </record>
+<!-- Vista formulario-->
 <record id="view_university_student_form" model="ir.ui.view">
     <field name="name">university.student.form</field>
     <field name="model">university.student</field>
@@ -506,7 +497,7 @@
         </form>
     </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_student_kanban" model="ir.ui.view">
     <field name="name">university.student.kanban</field>
     <field name="model">university.student</field>
@@ -553,11 +544,9 @@
         </kanban>
     </field>
 </record>
-<!-- ========================= -->
-<!--        ENROLLMENT         -->
-<!-- ========================= -->
+<!-- Matrícula -->
 
-<!-- TREE VIEW -->
+<!-- Viste tree -->
 <record id="view_university_enrollment_tree" model="ir.ui.view">
     <field name="name">university.enrollment.tree</field>
     <field name="model">university.enrollment</field>
@@ -572,7 +561,7 @@
     </field>
 </record>
 
-<!-- FORM VIEW -->
+<!-- Vista formulario-->
 <record id="view_university_enrollment_form" model="ir.ui.view">
     <field name="name">university.enrollment.form</field>
     <field name="model">university.enrollment</field>
@@ -620,7 +609,7 @@
     </field>
 </record>
 
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_enrollment_kanban" model="ir.ui.view">
     <field name="name">university.enrollment.kanban</field>
     <field name="model">university.enrollment</field>
@@ -650,11 +639,9 @@
         </kanban>
     </field>
 </record>
-<!-- ========================= -->
-<!--           GRADE           -->
-<!-- ========================= -->
+<!-- Calificación -->
 
-<!-- TREE VIEW -->
+<!-- Vista tree -->
 <record id="view_university_grade_tree" model="ir.ui.view">
     <field name="name">university.grade.tree</field>
     <field name="model">university.grade</field>
@@ -670,7 +657,7 @@
     </field>
 </record>
 
-<!-- FORM VIEW -->
+<!-- Vista formulario -->
 <record id="view_university_grade_form" model="ir.ui.view">
     <field name="name">university.grade.form</field>
     <field name="model">university.grade</field>
@@ -706,7 +693,7 @@
         </form>
     </field>
 </record>
-<!-- KANBAN VIEW -->
+<!-- Vista kanban -->
 <record id="view_university_grade_kanban" model="ir.ui.view">
     <field name="name">university.grade.kanban</field>
     <field name="model">university.grade</field>
@@ -735,62 +722,60 @@
         </kanban>
     </field>
 </record>
-<!-- ========================= -->
-<!--          ACTIONS          -->
-<!-- ========================= -->
+<!-- Acciones -->
 
-<!-- UNIVERSITY -->
+<!-- Universidad -->
 <record id="action_university_university" model="ir.actions.act_window">
     <field name="name">Universities</field>
     <field name="res_model">university.university</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- DEPARTMENT -->
+<!-- Departamento -->
 <record id="action_university_department" model="ir.actions.act_window">
     <field name="name">Departments</field>
     <field name="res_model">university.department</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- PROFESSOR -->
+<!-- Profesor -->
 <record id="action_university_professor" model="ir.actions.act_window">
     <field name="name">Professors</field>
     <field name="res_model">university.professor</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- SUBJECT -->
+<!-- Asignatura -->
 <record id="action_university_subject" model="ir.actions.act_window">
     <field name="name">Subjects</field>
     <field name="res_model">university.subject</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- STUDENT -->
+<!-- Estudiante -->
 <record id="action_university_student" model="ir.actions.act_window">
     <field name="name">Students</field>
     <field name="res_model">university.student</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- ENROLLMENT -->
+<!-- Matrícula -->
 <record id="action_university_enrollment" model="ir.actions.act_window">
     <field name="name">Enrollments</field>
     <field name="res_model">university.enrollment</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- GRADE -->
+<!-- Calificación -->
 <record id="action_university_grade" model="ir.actions.act_window">
     <field name="name">Grades</field>
     <field name="res_model">university.grade</field>
     <field name="view_mode">list,kanban,form</field>
 </record>
 
-<!-- SMARTBUTTON ACTIONS -->
+<!-- SMARTBUTTON -->
 
-<!-- Department → Professors -->
+<!-- Departamento → Profesor -->
 <record id="action_department_professors" model="ir.actions.act_window">
     <field name="name">Professors</field>
     <field name="res_model">university.professor</field>
@@ -798,7 +783,7 @@
     <field name="domain">[('department_id', '=', active_id)]</field>
 </record>
 
-<!-- Professor → Enrollments -->
+<!-- Profesor → Matrícula -->
 <record id="action_professor_enrollments" model="ir.actions.act_window">
     <field name="name">Enrollments</field>
     <field name="res_model">university.enrollment</field>
@@ -806,7 +791,7 @@
     <field name="domain">[('professor_id', '=', active_id)]</field>
 </record>
 
-<!-- Subject → Enrollments -->
+<!-- Asignatura → Matrícula -->
 <record id="action_subject_enrollments" model="ir.actions.act_window">
     <field name="name">Enrollments</field>
     <field name="res_model">university.enrollment</field>
@@ -814,7 +799,7 @@
     <field name="domain">[('subject_id', '=', active_id)]</field>
 </record>
 
-<!-- Student → Enrollments -->
+<!-- Estudiante → Matrícula -->
 <record id="action_student_enrollments" model="ir.actions.act_window">
     <field name="name">Enrollments</field>
     <field name="res_model">university.enrollment</field>
@@ -822,7 +807,7 @@
     <field name="domain">[('student_id', '=', active_id)]</field>
 </record>
 
-<!-- Student → Grades -->
+<!-- Estudiante → Calificación -->
 <record id="action_student_grades" model="ir.actions.act_window">
     <field name="name">Grades</field>
     <field name="res_model">university.grade</field>

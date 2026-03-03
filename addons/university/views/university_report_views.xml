@@ -1,52 +1,80 @@
 <odoo>
-    <!-- ======================= -->
-    <!--     PIVOT VIEW          -->
-    <!-- ======================= -->
+
+    <!-- Permite analizar datos del modelo university.report
+         agrupando por filas, columnas y medidas -->
     <record id="view_university_report_pivot" model="ir.ui.view">
         <field name="name">university.report.pivot</field>
+
+        <!-- Modelo al que pertenece la vista -->
         <field name="model">university.report</field>
+
         <field name="arch" type="xml">
             <pivot string="University Report">
+
+                <!-- Fila: nombre del estudiante -->
                 <field name="student_name" type="row"/>
+
+                <!-- Columna: universidad -->
                 <field name="university_name" type="col"/>
+
+                <!-- Medida numérica: nota media -->
                 <field name="average_grade" type="measure"/>
+
             </pivot>
         </field>
     </record>
 
-    <!-- ======================= -->
-    <!--      GRAPH VIEW         -->
-    <!-- ======================= -->
+
+    <!-- Muestra los datos en forma de gráfico -->
     <record id="view_university_report_graph" model="ir.ui.view">
         <field name="name">university.report.graph</field>
+
+        <!-- Modelo al que pertenece la vista -->
         <field name="model">university.report</field>
+
         <field name="arch" type="xml">
             <graph string="University Report" type="bar">
+
+                <!-- Agrupación por filas -->
                 <field name="student_name" type="row"/>
+
+                <!-- Medida numérica que se representa -->
                 <field name="average_grade" type="measure"/>
+
+                <!-- Agrupación por columnas -->
                 <field name="university_name" type="col"/>
+
             </graph>
         </field>
     </record>
 
-    <!-- ======================= -->
-    <!--         ACTION          -->
-    <!-- ======================= -->
+
+    <!-- Permite mostrar la vista pivot y la vista gráfica -->
     <record id="action_university_report" model="ir.actions.act_window">
         <field name="name">University Report</field>
+
+        <!-- Modelo que se abrirá -->
         <field name="res_model">university.report</field>
+
+        <!-- Vistas disponibles -->
         <field name="view_mode">pivot,graph</field>
     </record>
 
-    <!-- ======================= -->
-    <!--         MENUS           -->
-    <!-- ======================= -->
-    <!-- Optional: create a root Reports menu -->
-    <menuitem id="menu_university_reports_root" name="Reports" parent="menu_university_root" sequence="80"/>
 
-    <!-- Submenu: University Report -->
-    <menuitem id="menu_university_report" name="University Report"
+    <!-- Se añade un menú "Reports" dentro del módulo University
+         y un submenú para abrir el informe -->
+
+    <!-- Menú raíz para los reportes -->
+    <menuitem id="menu_university_reports_root"
+              name="Reports"
+              parent="menu_university_root"
+              sequence="80"/>
+
+    <!-- Submenú que abre la acción del informe -->
+    <menuitem id="menu_university_report"
+              name="University Report"
               parent="menu_university_reports_root"
               action="action_university_report"
               sequence="10"/>
+
 </odoo>

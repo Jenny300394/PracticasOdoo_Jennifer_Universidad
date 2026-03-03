@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Genera un PDF con el expediente académico usando QWeb -->
     <template id="report_student_pdf">
+
+        <!-- Contenedor HTML estándar para informes PDF -->
         <t t-call="web.html_container">
+
+            <!-- Recorremos cada documento de cada estudiante -->
             <t t-foreach="docs" t-as="doc">
+
+                <!-- Layout externo del informe (encabezado, pie, márgenes) -->
                 <t t-call="web.external_layout">
+
+                    <!-- Página del informe -->
                     <div class="page" style="font-family: 'Helvetica', sans-serif;">
-                        
+
+                        <!-- Estilos -->
                         <style>
                             .report-header { border-left: 8px solid #34495e; padding-left: 15px; margin-bottom: 30px; }
                             .report-title { font-size: 28px; font-weight: bold; color: #2c3e50; }
@@ -17,11 +28,14 @@
                             .badge-fail { color: #c0392b; font-weight: bold; }
                         </style>
 
+                        <!-- Encabezado del informe -->
                         <div class="report-header">
                             <div class="row">
                                 <div class="col-7">
                                     <h1 class="report-title">Expediente Académico</h1>
                                 </div>
+
+                                <!-- Fecha actual -->
                                 <div class="col-5 text-end">
                                     <strong>Fecha:</strong>
                                     <span t-esc="datetime.date.today().strftime('%d/%m/%Y')"/>
@@ -29,19 +43,26 @@
                             </div>
                         </div>
 
+                        <!-- Información del estudiante -->
                         <div class="info-card">
                             <div class="row">
+
+                                <!-- Datos personales -->
                                 <div class="col-6">
                                     <strong>Estudiante:</strong> <span t-field="doc.name"/><br/>
                                     <strong>Email:</strong> <span t-field="doc.email"/>
                                 </div>
+
+                                <!-- Datos académicos -->
                                 <div class="col-6 text-end">
                                     <strong>Universidad:</strong> <span t-field="doc.university_id.name"/><br/>
                                     <strong>Tutor:</strong> <span t-field="doc.tutor_id.name"/>
                                 </div>
+
                             </div>
                         </div>
 
+                        <!-- Tabla de calificaciones -->
                         <table class="table-modern">
                             <thead>
                                 <tr>
@@ -50,31 +71,52 @@
                                     <th class="text-center">Nota</th>
                                 </tr>
                             </thead>
+
                             <tbody>
+
+                                <!-- Recorremos todas las notas del estudiante -->
                                 <t t-foreach="doc.grade_ids" t-as="g">
                                     <tr>
+
+                                        <!-- Nombre de la asignatura -->
                                         <td><span t-field="g.enrollment_id.subject_id.name"/></td>
+
+                                        <!-- Profesor responsable -->
                                         <td><span t-field="g.enrollment_id.professor_id.name"/></td>
+
+                                        <!-- Nota con color verde/rojo según aprobado o suspenso -->
                                         <td class="text-center">
                                             <span t-att-class="g.grade &gt;= 5 and 'badge-pass' or 'badge-fail'">
                                                 <span t-field="g.grade"/>
                                             </span>
                                         </td>
+
                                     </tr>
                                 </t>
+
                             </tbody>
                         </table>
 
+                        <!-- Cálculo de nota media -->
                         <div class="row mt-4">
                             <div class="col-12 text-end">
+
+                                <!-- Obtenemos todas las notas en una lista -->
                                 <t t-set="grades" t-value="doc.grade_ids.mapped('grade')"/>
+
+                                <!-- Caja visual con la media -->
                                 <div style="font-size: 18px; font-weight: bold; background: #2c3e50; color: white; display: inline-block; padding: 10px 20px; border-radius: 5px;">
-                                    MEDIA TOTAL: 
+                                    MEDIA TOTAL:
+
+                                    <!-- Si hay notas, calculamos la media -->
                                     <t t-if="grades">
                                         <t t-esc="sum(grades) / len(grades)" t-options='{"widget": "float", "precision": 2}'/>
                                     </t>
+
+                                    <!-- Si no hay notas, mostramos 0.00 -->
                                     <t t-else="">0.00</t>
                                 </div>
+
                             </div>
                         </div>
 
@@ -84,12 +126,19 @@
         </t>
     </template>
 
+
+    <!-- Permite que el informe aparezca en el menú "Imprimir" -->
     <record id="action_student_report" model="ir.actions.report">
         <field name="name">Certificado de Notas</field>
         <field name="model">university.student</field>
         <field name="report_type">qweb-pdf</field>
+
+        <!-- Nombre técnico del informe (ruta QWeb) -->
         <field name="report_name">university.report_student_pdf</field>
+
+        <!-- Enlazamos el informe al modelo -->
         <field name="binding_model_id" ref="model_university_student"/>
         <field name="binding_type">report</field>
     </record>
+
 </odoo>

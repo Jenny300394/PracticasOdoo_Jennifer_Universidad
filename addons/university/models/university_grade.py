@@ -1,11 +1,12 @@
 from odoo import models, fields, api
 
 class Grade(models.Model):
+    # Nombre técnico del modelo y cómo queremos que se vea en los listados
     _name = "university.grade"
     _description = "Grade"
     _rec_name = "display_name"
 
-    # RELACIONES MANY2ONE CON CASCADE
+    # Relación con el alumno. Si se borra el alumno, su nota desaparece (cascade)
     student_id = fields.Many2one(
         "university.student", 
         string="Student", 
@@ -13,6 +14,7 @@ class Grade(models.Model):
         ondelete='cascade'
     )
     
+    # Relación con la matrícula específica. También desaparece si se borra la matrícula
     enrollment_id = fields.Many2one(
         "university.enrollment", 
         string="Enrollment", 
@@ -20,24 +22,25 @@ class Grade(models.Model):
         ondelete='cascade'
     )
     
-    # --- LOGICA DE LIMPIEZA AUTOMÁTICA ---
+    # Esta función sirve para que no se mezclen matrículas de alumnos distintos
     @api.onchange('student_id')
     def _onchange_student_id(self):
-        """
-        Si el usuario cambia el estudiante, borramos la matrícula seleccionada 
-        para que no se quede una matrícula que no le pertenece.
-        """
         for record in self:
             if record.student_id:
-                # Si la matrícula actual no es de este estudiante, la vaciamos
+                # Si el alumno no coincide con el de la matrícula, limpiamos el campo
                 if record.enrollment_id and record.enrollment_id.student_id != record.student_id:
                     record.enrollment_id = False
             else:
+                # Si no hay alumno, tampoco puede haber matrícula seleccionada
                 record.enrollment_id = False
 
+    # El campo de la nota numérica
     grade = fields.Float(string="Grade", required=True)
+    
+    # Nombre que se mostrará en el sistema (ej. "Jennifer - PRO/2026/0001")
     display_name = fields.Char(compute="_compute_display_name", store=True)
 
+    # Aquí formamos el nombre combinando el alumno y su matrícula
     @api.depends('student_id.name', 'enrollment_id.name')
     def _compute_display_name(self):
         for record in self:
@@ -45,9 +48,9 @@ class Grade(models.Model):
             e_name = record.enrollment_id.name or 'Sin Matrícula'
             record.display_name = f"{s_name} - {e_name}"
 
-    # --- SMART BUTTON ---
+    # Botón inteligente para saltar rápidamente a ver la ficha de la matrícula
     def action_view_enrollment(self):
-        self.ensure_one() # Buena práctica añadir esto en botones
+        self.ensure_one() # Esto asegura que solo estamos pinchando en un registro
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'university.enrollment',

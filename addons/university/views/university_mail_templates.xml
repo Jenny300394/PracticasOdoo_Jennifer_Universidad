@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Esta plantilla se usa para enviar por correo el PDF generado -->
     <data noupdate="1">
+
+        <!-- Registro del template de correo -->
         <record id="email_template_student_report" model="mail.template">
+
+            <!-- Nombre interno del template -->
             <field name="name">Student Report: Send by Email</field>
+
+            <!-- Modelo al que está asociado el template (estudiantes) -->
             <field name="model_id" ref="university.model_university_student"/>
+
+            <!-- Asunto del correo, usando datos del estudiante -->
             <field name="subject">Academic Report: {{ object.name }}</field>
+
+            <!-- Dirección del remitente (usuario que envía el correo) -->
             <field name="email_from">{{ (user.email_formatted) }}</field>
+
+            <!-- Dirección del destinatario (email del estudiante) -->
             <field name="email_to">{{ object.email }}</field>
+
+            <!-- Cuerpo del correo en HTML -->
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px;">
                     <p>Hello <t t-out="object.name"/>,</p>
@@ -14,7 +30,11 @@
                     <p>Best regards,<br/>University Team</p>
                 </div>
             </field>
+
+            <!-- Adjuntamos el informe PDF al correo -->
             <field name="report_template_ids" eval="[(4, ref('university.action_student_report'))]"/>
+
         </record>
+
     </data>
 </odoo>

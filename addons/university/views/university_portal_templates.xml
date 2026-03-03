@@ -1,22 +1,46 @@
 <odoo>
+
+    <!-- Esta plantilla hereda el menú principal del portal y añade
+         un acceso directo a las calificaciones del estudiante -->
     <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
+
+        <!-- Insertamos dentro del bloque donde se listan los accesos del portal -->
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+
+            <!-- Solo se muestra si el usuario tiene calificaciones -->
             <t t-if="grade_count" t-call="portal.portal_docs_entry">
+
+                <!-- Título que aparecerá en el menú -->
                 <t t-set="title">Grades</t>
+
+                <!-- URL que abrirá la lista de calificaciones -->
                 <t t-set="url" t-value="'/my/grades'"/>
+
+                <!-- Contador de elementos (número de calificaciones) -->
                 <t t-set="placeholder_count" t-value="'grade_count'"/>
             </t>
         </xpath>
     </template>
 
+
+    <!-- Muestra una tabla con el historial académico del usuario -->
     <template id="portal_my_grades_list" name="My Grades">
+
+        <!-- Usamos el layout estándar del portal -->
         <t t-call="portal.portal_layout">
+
+            <!-- Activa la barra de búsqueda y breadcrumbs del portal -->
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
-            
+
             <div class="container mt-3">
+
+                <!-- Título principal -->
                 <h3 class="mb-4">Academic Grades History</h3>
-                
+
+                <!-- Tabla con las calificaciones -->
                 <table class="table table-hover bg-white o_portal_my_doc_table">
+
+                    <!-- Encabezados -->
                     <thead>
                         <tr class="active">
                             <th>Subject</th>
@@ -25,27 +49,45 @@
                             <th class="text-center">Grade</th>
                         </tr>
                     </thead>
+
+                    <!-- Cuerpo de la tabla -->
                     <tbody>
+
+                        <!-- Recorremos cada calificación -->
                         <t t-foreach="grades" t-as="g">
                             <tr>
+
+                                <!-- Nombre de la asignatura -->
                                 <td>
-                                    <span t-if="g.enrollment_id" t-field="g.enrollment_id.subject_id.name"/>
+                                    <span t-if="g.enrollment_id"
+                                          t-field="g.enrollment_id.subject_id.name"/>
                                 </td>
+
+                                <!-- Profesor -->
                                 <td>
-                                    <span t-if="g.enrollment_id" t-field="g.enrollment_id.professor_id.name"/>
+                                    <span t-if="g.enrollment_id"
+                                          t-field="g.enrollment_id.professor_id.name"/>
                                 </td>
+
+                                <!-- Fecha de creación del registro -->
                                 <td>
-                                    <span t-field="g.create_date" t-options='{"widget": "date"}'/>
+                                    <span t-field="g.create_date"
+                                          t-options='{"widget": "date"}'/>
                                 </td>
+
+                                <!-- Nota con color verde si es aprobado, rojo si es suspenso-->
                                 <td class="text-center">
-                                    <span t-attf-class="badge rounded-pill #{'text-bg-success' if g.grade >= 5 else 'text-bg-danger'}" 
+                                    <span t-attf-class="badge rounded-pill #{'text-bg-success' if g.grade >= 5 else 'text-bg-danger'}"
                                           t-field="g.grade"/>
                                 </td>
+
                             </tr>
                         </t>
+
                     </tbody>
                 </table>
             </div>
         </t>
     </template>
+
 </odoo>

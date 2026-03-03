@@ -2,23 +2,21 @@ from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
 class University(models.Model):
+    # Nombre del modelo principal de la institución
     _name = "university.university"
     _description = "University"
-
-    # --- DOBLE CANDADO DE SEGURIDAD ---
     
-    # 1. Bloqueo en Base de Datos (SQL)
+    # 1. Bloqueo en Base de Datos: Para que no haya dos universidades iguales en la tabla
     _sql_constraints = [
         ('name_university_unique', 
          'unique(name)', 
          '¡Error! Ya existe una universidad registrada con este nombre.')
     ]
 
-    # 2. Bloqueo en Python (Por si el SQL falla al actualizar)
+    # 2. Bloqueo en Python: Usamos =ilike para que no importe si escriben en mayúsculas o minúsculas
     @api.constrains('name')
     def _check_unique_university_name(self):
         for record in self:
-            # Buscamos si existe otra uni con el mismo nombre (ignorando mayúsculas/minúsculas)
             existing = self.search([
                 ('id', '!=', record.id),
                 ('name', '=ilike', record.name)
@@ -29,26 +27,28 @@ class University(models.Model):
                     "No se permiten nombres duplicados."
                 )
 
-    # --- CAMPOS BÁSICOS ---
+    # El nombre de la universidad es el campo principal y obligatorio
     name = fields.Char(string="Name", required=True)
     
-    # MANEJO DE IMÁGENES
+    # Manejo de imágenes
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
 
+    # Campos de dirección para saber dónde está la universidad
     street = fields.Char(string="Street")
     city = fields.Char(string="City")
     state_id = fields.Many2one("res.country.state", string="State")
     zip = fields.Char(string="ZIP")
     country_id = fields.Many2one("res.country", string="Country")
 
+    # El director de la universidad (es un profesor)
     director_id = fields.Many2one(
         "university.professor",
         string="Director",
         ondelete='set null',
     )
 
-    # --- RELACIONES + CONTADORES ---
+    # Listamos todo lo que pertenece a esta universidad: matrículas, alumnos, profesores y departamentos
     enrollment_ids = fields.One2many("university.enrollment", "university_id", string="Enrollments")
     enrollment_count = fields.Integer(string="Enrollments Count", compute="_compute_counts", store=True)
 
@@ -61,6 +61,7 @@ class University(models.Model):
     department_ids = fields.One2many("university.department", "university_id", string="Departments")
     department_count = fields.Integer(string="Departments Count", compute="_compute_counts", store=True)
 
+    # Esta función rellena todos los contadores de golpe cuando algo cambia
     @api.depends('enrollment_ids', 'student_ids', 'professor_ids', 'department_ids')
     def _compute_counts(self):
         for record in self:
@@ -70,6 +71,7 @@ class University(models.Model):
             record.department_count = len(record.department_ids)
 
     # --- ACCIONES DE SMART BUTTONS ---
+    # Todos estos botones sirven para saltar a las listas filtradas por esta universidad
 
     def action_view_students(self):
         self.ensure_one()
@@ -128,6 +130,7 @@ class University(models.Model):
 
     def action_view_grades(self):
         self.ensure_one()
+        # En las notas filtramos a través del alumno para saber cuáles son de esta universidad
         return {
             "type": "ir.actions.act_window", 
             "name": "Grades", 

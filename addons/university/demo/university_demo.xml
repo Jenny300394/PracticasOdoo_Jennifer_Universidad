@@ -1,7 +1,7 @@
 <odoo>
     <data noupdate="1">
         <record id="demo_university_1" model="university.university">
-            <field name="name">Universidad de Jennifer (Demo)</field>
+            <field name="name">Universidad de Prueba</field>
             <field name="city">Madrid</field>
         </record>
 
@@ -12,14 +12,14 @@
 
         <record id="demo_student_1" model="university.student">
             <field name="name">Jennifer Alumna Prueba</field>
-            <field name="email">jennifer.demo@example.com</field>
+            <field name="email">jennifer.demo@gmail.com</field>
             <field name="university_id" ref="demo_university_1"/>
         </record>
 
         <record id="demo_grade_1" model="university.grade">
             <field name="student_id" ref="demo_student_1"/>
             <field name="subject_id" ref="demo_subject_1"/>
-            <field name="grade">9.5</field>
+            <field name="grade">9</field>
         </record>
     </data>
 </odoo>

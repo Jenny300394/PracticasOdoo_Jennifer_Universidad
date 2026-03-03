@@ -1,12 +1,13 @@
 from odoo import models, fields, api
 
 class Subject(models.Model):
+    # Nombre del modelo para las asignaturas
     _name = "university.subject"
     _description = "Subject"
 
     name = fields.Char(string="Name", required=True)
     
-    # ÚNICO SITIO CON CASCADE: La asignatura pertenece a la institución.
+    # Si borramos la universidad, sus asignaturas ya no tiene sentido que aparezcan (por eso usamos cascade)
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
@@ -14,7 +15,7 @@ class Subject(models.Model):
         ondelete='cascade'
     )
 
-    # RELACIONES (Aquí NO se toca el ondelete)
+    # Relación de muchos a muchos con los profesores que imparten la asignatura
     professor_ids = fields.Many2many(
         "university.professor",
         "university_professor_subject_rel",
@@ -22,21 +23,25 @@ class Subject(models.Model):
         "professor_id",
         string="Professors",
     )
-    # One2many: Jamás poner ondelete aquí, es lo que rompe el sistema.
+    
+    # Listado de todas las matrículas hechas en esta asignatura
     enrollment_ids = fields.One2many("university.enrollment", "subject_id", string="Enrollments")
 
-    # --- El resto de tu lógica de contadores y acciones se mantiene igual ---
+    # Campos para llevar la cuenta de cuántos hay de cada cosa
     enrollment_count = fields.Integer(string="Enrollments", compute="_compute_counts")
     student_count = fields.Integer(string="Students", compute="_compute_counts")
     professor_count = fields.Integer(string="Professors Count", compute="_compute_counts")
 
+    # Función para calcular los contadores de los Smart Buttons
     @api.depends('enrollment_ids', 'professor_ids')
     def _compute_counts(self):
         for record in self:
             record.enrollment_count = len(record.enrollment_ids)
+            # Con mapped sacamos los estudiantes únicos sin que se repitan
             record.student_count = len(record.enrollment_ids.mapped('student_id'))
             record.professor_count = len(record.professor_ids)
 
+    # Botón para saltar a ver las matrículas de esta asignatura
     def action_view_enrollments(self):
         self.ensure_one()
         return {
@@ -48,6 +53,7 @@ class Subject(models.Model):
             "context": {"default_subject_id": self.id},
         }
 
+    # Botón para ver la lista de alumnos apuntados a esta materia
     def action_view_students(self):
         self.ensure_one()
         student_ids = self.enrollment_ids.mapped('student_id').ids
@@ -56,9 +62,11 @@ class Subject(models.Model):
             "name": "Students",
             "res_model": "university.student",
             "view_mode": "list,kanban,form",
+            # Si no hay alumnos, pasamos un [0] para que no de error la ventana
             "domain": [("id", "in", student_ids or [0])],
         }
 
+    # Botón para ver los profesores que imparten esta asignatura
     def action_view_professors(self):
         self.ensure_one()
         return {
