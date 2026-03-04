@@ -44,7 +44,11 @@
 
                     <group>
                         <field name="name"/>
-                        <field name="director_id"/>
+                        
+                        <field name="director_id" 
+                               string="Director"
+                               domain="[('university_id', '=', id)]"
+                               options="{'no_create': True}"/>
                     </group>
 
                     <group string="Address">

@@ -7,9 +7,8 @@ class Student(models.Model):
 
     # Campos básicos del alumno
     name = fields.Char(string="Name", required=True)
-    # Relación con el contacto y el usuario del sistema
     partner_id = fields.Many2one("res.partner", string="Related Contact")
-    user_id = fields.Many2one("res.users", string="Related User", readonly=True)
+    user_id = fields.Many2one("res.users", string="Related User")
     
     # Ponemos el email obligatorio para que no haya fallos al enviar los informes
     email = fields.Char(string="Email", required=True)
@@ -18,7 +17,7 @@ class Student(models.Model):
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
     image_128 = fields.Image(string="Image 128", related="image_1920", max_width=128, max_height=128, store=True)
     
-    # A qué universidad pertenece (si se borra la uni, se borra el alumno con cascade)
+    # A qué universidad pertenece (si se borra la universidad, se borra el alumno con cascade)
     university_id = fields.Many2one(
         "university.university", 
         string="University", 
@@ -26,7 +25,30 @@ class Student(models.Model):
         ondelete='cascade'
     )
 
-    # Si cambiamos la uni del alumno, se la cambiamos también a sus matrículas automáticamente
+    # --- Crear el usuario portal automáticamente ---
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('email') and not vals.get('user_id'):
+                # 1. Creamos el usuario 
+                new_user = self.env['res.users'].sudo().create({
+                    'name': vals.get('name'),
+                    'login': vals.get('email'),
+                    'email': vals.get('email'),
+                })
+                
+                # 2. Asignamos el grupo de Portal inmediatamente después con write()
+                portal_group = self.env.ref('base.group_portal', raise_if_not_found=False)
+                if portal_group:
+                    new_user.sudo().write({'groups_id': [(4, portal_group.id)]})
+                
+                # 3. Asignamos los IDs al alumno
+                vals['user_id'] = new_user.id
+                vals['partner_id'] = new_user.partner_id.id
+                
+        return super(Student, self).create(vals_list)
+
+    # Si cambiamos la universidad del alumno, se la cambiamos también a sus matrículas automáticamente
     @api.onchange('university_id')
     def _onchange_university_id(self):
         for record in self:
@@ -44,7 +66,6 @@ class Student(models.Model):
     def _check_unique_student_email(self):
         for record in self:
             if record.email:
-                # El sudo() sirve para buscar en toda la base de datos sin restricciones
                 duplicate = self.sudo().search([
                     ('id', '!=', record.id),
                     ('email', '=', record.email)
