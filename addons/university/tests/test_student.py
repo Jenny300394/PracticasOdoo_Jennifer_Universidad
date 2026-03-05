@@ -1,19 +1,78 @@
 from odoo.tests.common import TransactionCase
+from odoo.exceptions import ValidationError
 
-class TestStudent(TransactionCase):
-    def test_01_student_values(self):
-        # Esta prueba sirve para ver si los datos del alumno se guardan bien en la base de datos
+class TestUniversity(TransactionCase):
+
+    def setUp(self):
+        """Preparamos los datos básicos para todas las pruebas"""
+        super(TestUniversity, self).setUp()
         
-        # Primero creamos una universidad de prueba rápida
-        uni = self.env['university.university'].create({'name': 'Uni Test'})
-        
-        # Registramos un alumno nuevo vinculado a esa universidad
-        student = self.env['university.student'].create({
-            'name': 'Jennifer Test',
-            'university_id': uni.id,
-            'email': 'test@test.com'
+        # 1. Creamos la Universidad
+        self.uni = self.env['university.university'].create({
+            'name': 'Universidad de Jennifer'
         })
         
-        # Comprobamos que el nombre y el email guardados coincidan con lo que hemos puesto
-        self.assertEqual(student.name, 'Jennifer Test')
-        self.assertEqual(student.email, 'test@test.com')
+        # 2. Creamos un Estudiante (Lo que ya tenías)
+        self.student = self.env['university.student'].create({
+            'name': 'Jennifer Test',
+            'university_id': self.uni.id,
+            'email': 'jennifer@test.com'
+        })
+        
+        # 3. Creamos una Asignatura
+        self.subject = self.env['university.subject'].create({
+            'name': 'Programación Odoo',
+            'university_id': self.uni.id
+        })
+
+    def test_01_student_values(self):
+        """TEST DE DATOS: ¿Se guardan los datos básicos?"""
+        self.assertEqual(self.student.name, 'Jennifer Test')
+        self.assertEqual(self.student.email, 'jennifer@test.com')
+
+    def test_02_enrollment_count(self):
+        """TEST DE LÓGICA: ¿El contador de matrículas sube al matricular?"""
+        # Creamos una matrícula para el alumno
+        self.env['university.enrollment'].create({
+            'student_id': self.student.id,
+            'subject_id': self.subject.id,
+        })
+        
+        # Forzamos el recálculo del campo compute 'enrollment_count'
+        self.student._compute_enrollment_count()
+        
+        # Verificamos que ahora el contador sea 1
+        self.assertEqual(self.student.enrollment_count, 1, "El contador debería haber subido a 1")
+
+    def test_03_grade_logic(self):
+        """TEST DE NOTAS: ¿Se vinculan bien las calificaciones?"""
+        enrollment = self.env['university.enrollment'].create({
+            'student_id': self.student.id,
+            'subject_id': self.subject.id,
+        })
+        
+        # Creamos una nota
+        grade_rec = self.env['university.grade'].create({
+            'student_id': self.student.id,
+            'enrollment_id': enrollment.id,
+            'grade': 8.5
+        })
+        
+        # Verificamos que la nota guardada sea la correcta
+        self.assertEqual(grade_rec.grade, 8.5)
+
+    def test_04_grade_security(self):
+        """TEST DE SEGURIDAD: ¿Bloquea notas mayores a 10?"""
+        enrollment = self.env['university.enrollment'].create({
+            'student_id': self.student.id,
+            'subject_id': self.subject.id,
+        })
+        
+        # Intentamos crear una nota de 15.0 
+        with self.assertRaises(ValidationError):
+            self.env['university.grade'].create({
+                'student_id': self.student.id,
+                'enrollment_id': enrollment.id,
+                'grade': 15.0
+            })
+#comando para terminal y ver si funcionan test docker compose run --rm odoo -u university -d University_completa --test-enable --stop-after-init

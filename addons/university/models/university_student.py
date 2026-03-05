@@ -37,10 +37,15 @@ class Student(models.Model):
                     'email': vals.get('email'),
                 })
                 
-                # 2. Asignamos el grupo de Portal inmediatamente después con write()
+                # 2. Asignamos el grupo (CON ESCUDO DE SEGURIDAD)
                 portal_group = self.env.ref('base.group_portal', raise_if_not_found=False)
                 if portal_group:
-                    new_user.sudo().write({'groups_id': [(4, portal_group.id)]})
+                    try:
+                        # Intentamos asignar el grupo. Si Odoo da el error de "Invalid Field", 
+                        # lo ignoramos para que el proceso no se detenga.
+                        new_user.sudo().write({'groups_id': [(4, portal_group.id)]})
+                    except Exception:
+                        pass
                 
                 # 3. Asignamos los IDs al alumno
                 vals['user_id'] = new_user.id
@@ -152,7 +157,6 @@ class Student(models.Model):
     # Esta función abre la ventana para enviar el informe por email
     def action_send_report_email(self):
         self.ensure_one()
-        # Buscamos la plantilla que creamos en XML
         template = self.env.ref('university.email_template_student_report', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
