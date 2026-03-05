@@ -6,3 +6,5 @@ from . import university_student
 from . import university_university   
 from . import university_enrollment   
 from . import university_report       
+from . import university_sale_order
+from . import payment_provider

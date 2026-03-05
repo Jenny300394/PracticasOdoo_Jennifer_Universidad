@@ -274,3 +274,54 @@ msgstr "Asignaturas"
 #: model_terms:ir.ui.view,arch_db:university.view_university_university_form
 msgid "Departments"
 msgstr "Departamentos"
+# --- TRADUCCIONES PARA LA WEB (VISTAS DE UNIVERSIDAD Y PROFESORES) ---
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.university_list_template
+msgid "Our Universities"
+msgstr "Nuestras Universidades"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.university_list_template
+#: model_terms:ir.ui.view,arch_db:university.professor_list_template
+msgid "View Professors"
+msgstr "Ver Profesores"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.professor_list_template
+msgid "Teaching Staff"
+msgstr "Cuerpo Docente"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.professor_list_template
+msgid "Back to Universities"
+msgstr "Volver a Universidades"
+
+# --- TRADUCCIONES PARA EL PORTAL DE CALIFICACIONES ---
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_home_menu_grades
+msgid "Grades"
+msgstr "Calificaciones"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+msgid "Academic Grades History"
+msgstr "Historial Académico de Notas"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+msgid "Subject"
+msgstr "Asignatura"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+msgid "Professor"
+msgstr "Profesor"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.portal_my_grades_list
+msgid "Date"
+msgstr "Fecha"
+
+

@@ -3,60 +3,55 @@ from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal
 
 class UniversityWebsite(http.Controller):
-
     @http.route(['/universidad'], type='http', auth="public", website=True)
     def list_universities(self, **post):
-        # Sacamos todas las universidades para que salgan en la lista de la web
         universities = request.env['university.university'].sudo().search([])
-        return request.render("university.university_list_template", {
-            'universities': universities
-        })
+        return request.render("university.university_list_template", {'universities': universities})
 
     @http.route(['/profesores/<model("university.university"):univ>'], type='http', auth="public", website=True)
     def list_professors(self, univ, **post):
-        # Aquí mostramos solo los profesores que son de la universidad que hemos pinchado
-        return request.render("university.professor_list_template", {
-            'university': univ,
-            'professors': univ.professor_ids
-        })
+        return request.render("university.professor_list_template", {'university': univ, 'professors': univ.professor_ids})
 
 class UniversityPortal(CustomerPortal):
-
     def _prepare_home_portal_values(self, counters):
-        # Llamamos a lo que ya hace Odoo por defecto en el portal
         values = super()._prepare_home_portal_values(counters)
-        
-        # Buscamos si el usuario que ha entrado tiene ficha de estudiante
-        student = request.env['university.student'].sudo().search([
-            ('partner_id', '=', request.env.user.partner_id.id)
-        ], limit=1)
-
-        # Si no es un estudiante, le quitamos el botón de notas para que no lo vea
+        student = request.env['university.student'].sudo().search([('partner_id', '=', request.env.user.partner_id.id)], limit=1)
         if not student:
-            if 'grade_count' in values:
-                del values['grade_count']
+            if 'grade_count' in values: del values['grade_count']
             return values
-
-        # Si sí es un alumno, contamos sus notas para que salga el aviso en el portal
         if 'grade_count' in counters:
-            values['grade_count'] = request.env['university.grade'].sudo().search_count([
-                ('student_id', '=', student.id)
-            ])
+            values['grade_count'] = request.env['university.grade'].sudo().search_count([('student_id', '=', student.id)])
         return values
 
     @http.route(['/my/grades'], type='http', auth="user", website=True)
     def portal_my_grades(self, **kw):
-        # Volvemos a buscar al estudiante para poder sacar sus cosas
-        student = request.env['university.student'].sudo().search([
-            ('partner_id', '=', request.env.user.partner_id.id)
-        ], limit=1)
+        student = request.env['university.student'].sudo().search([('partner_id', '=', request.env.user.partner_id.id)], limit=1)
+        grades = request.env['university.grade'].sudo().search([('student_id', '=', student.id)]) if student else []
+        return request.render("university.portal_my_grades_template", {'grades': grades, 'page_name': 'grades'})
+
+# --- ESTO SOLUCIONA TU PROBLEMA ---
+class UniversityWebsiteSale(http.Controller):
+    @http.route(['/shop/payment/update_discount'], type='json', auth="public", website=True)
+    def update_payment_discount(self, provider_id=None, **post):
+        # 1. Buscamos el pedido actual. Si no existe, lo creamos.
+        order = request.website.sale_get_order(force_create=True)
         
-        # Filtramos para que el alumno solo pueda ver sus notas y no las de otros
-        grades = request.env['university.grade'].sudo().search([
-            ('student_id', '=', student.id)
-        ]) if student else []
-        
-        return request.render("university.portal_my_grades_template", {
-            'grades': grades,
-            'page_name': 'grades',
-        })
+        if order:
+            # 2. Obligamos a Odoo a guardar el pedido en la base de datos
+            # Le ponemos el cliente actual para que salga en "Pedidos sin pagar"
+            order.sudo().write({
+                'partner_id': request.env.user.partner_id.id,
+                'origin': 'Descuento Web Aplicado'
+            })
+            
+            # 3. Llamamos a tu lógica de Python
+            if provider_id:
+                order.sudo()._update_payment_discount(provider_id)
+            
+            # 4. Forzamos el recalculo de impuestos y totales
+            order.sudo()._amount_all()
+            request.env.cr.commit()
+            
+            print(f">>> PEDIDO ACTUALIZADO Y VISIBLE: {order.name}")
+            return True
+        return False

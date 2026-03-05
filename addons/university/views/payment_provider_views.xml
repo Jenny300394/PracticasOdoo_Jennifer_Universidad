@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_provider_view_form_inherit_university" model="ir.ui.view">
+        <field name="name">payment.provider.view.form.inherit.university</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Descuentos por Universidad" name="discount_config">
+                    <group>
+                        <field name="discount_product_id"/>
+                        <field name="discount_type" widget="radio" options="{'horizontal': True}"/>
+                        
+                        <field name="discount_fixed_amount" 
+                               invisible="discount_type != 'fixed'"/>
+                        <field name="discount_percent_amount" 
+                               invisible="discount_type != 'percent'"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

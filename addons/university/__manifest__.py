@@ -5,7 +5,14 @@
     "description": "Module to manage universities, departments, professors, students, enrollments and grades.",
     "author": "Jennifer",
     "category": "Education",
-    "depends": ["base", "mail", "website", "portal"],
+    "depends": [
+        "base", 
+        "mail", 
+        "website", 
+        "portal", 
+        "website_sale", 
+        "payment"       
+    ],
     "data": [
         "security/ir.model.access.csv",
         "views/university_views.xml",             
@@ -14,8 +21,14 @@
         "views/university_report_views.xml",      
         "views/university_mail_templates.xml", 
         "views/university_website_templates.xml", 
-        "views/university_portal_templates.xml", 
+        "views/university_portal_templates.xml",
+        "views/payment_provider_views.xml", 
     ],
+    "assets": {
+        "web.assets_frontend": [
+            "university/static/src/js/payment_discount.js", 
+        ],
+    },
     "demo": [
         "demo/university_demo.xml",
     ],
