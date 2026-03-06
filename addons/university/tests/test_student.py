@@ -7,77 +7,95 @@ class TestUniversity(TransactionCase):
         """Preparamos los datos básicos para todas las pruebas"""
         super(TestUniversity, self).setUp()
         
-        # 1. Creamos la Universidad
+        # 1. Universidad
         self.uni = self.env['university.university'].create({
             'name': 'Universidad de Jennifer'
         })
         
-        # 2. Creamos un Estudiante
+        # 2. Estudiante
         self.student = self.env['university.student'].create({
             'name': 'Jennifer Test',
             'university_id': self.uni.id,
             'email': 'jennifer@test.com'
         })
         
-        # 3. Creamos una Asignatura
+        # 3. Asignatura
         self.subject = self.env['university.subject'].create({
             'name': 'Programación Odoo',
             'university_id': self.uni.id
         })
 
     def test_01_student_values(self):
-        """TEST DE DATOS: ¿Se guardan los datos básicos?"""
+        """¿Se guardan los datos básicos?"""
         self.assertEqual(self.student.name, 'Jennifer Test')
         self.assertEqual(self.student.email, 'jennifer@test.com')
 
     def test_02_enrollment_count(self):
-        """TEST DE LÓGICA: ¿El contador de matrículas sube al matricular?"""
-        # AÑADIDO: university_id para cumplir con el NotNull
+        """¿El contador de matrículas sube al matricular?"""
         self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
             'university_id': self.uni.id,
         })
-        
-        # Forzamos el recálculo
         self.student._compute_counts()
-        
-        # Verificamos que ahora el contador sea 1
-        self.assertEqual(self.student.enrollment_count, 1, "El contador debería haber subido a 1")
+        self.assertEqual(self.student.enrollment_count, 1)
 
     def test_03_grade_logic(self):
-        """TEST DE NOTAS: ¿Se vinculan bien las calificaciones?"""
-        # AÑADIDO: university_id
+        """¿Se vinculan bien las calificaciones y el display_name?"""
         enrollment = self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
             'university_id': self.uni.id,
         })
         
-        # Creamos una nota
         grade_rec = self.env['university.grade'].create({
             'student_id': self.student.id,
             'enrollment_id': enrollment.id,
             'grade': 8.5
         })
         
-        # Verificamos que la nota guardada sea la correcta
         self.assertEqual(grade_rec.grade, 8.5)
+        # Verificamos que el display_name se calculó (ej: "Jennifer Test - MATRICULA-XXX")
+        self.assertIn('Jennifer Test', grade_rec.display_name)
 
     def test_04_grade_security(self):
-        """TEST DE SEGURIDAD: ¿Bloquea notas mayores a 10?"""
-        # AÑADIDO: university_id
+        """¿Bloquea notas mayores a 10? (Validación de rango)"""
         enrollment = self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
             'university_id': self.uni.id,
         })
         
-        # Intentamos crear una nota de 15.0 
         with self.assertRaises(ValidationError):
             self.env['university.grade'].create({
                 'student_id': self.student.id,
                 'enrollment_id': enrollment.id,
                 'grade': 15.0
             })
+
+    def test_05_cascade_delete(self):
+        """INTEGRIDAD: Si borro al alumno, ¿desaparecen sus notas? (ondelete='cascade')"""
+        enrollment = self.env['university.enrollment'].create({
+            'student_id': self.student.id,
+            'subject_id': self.subject.id,
+            'university_id': self.uni.id,
+        })
+        grade_rec = self.env['university.grade'].create({
+            'student_id': self.student.id,
+            'enrollment_id': enrollment.id,
+            'grade': 7.0
+        })
+        grade_id = grade_rec.id
+        
+        # Borramos al alumno
+        self.student.unlink()
+        
+        # Buscamos la nota por ID para ver si todavía existe
+        remaining_grade = self.env['university.grade'].search([('id', '=', grade_id)])
+        self.assertFalse(remaining_grade, "La nota debería haberse borrado automáticamente (Cascade)")
+
+    def test_06_student_email_change(self):
+        """¿Se actualiza correctamente el email del alumno?"""
+        self.student.write({'email': 'nuevo_email@jennifer.com'})
+        self.assertEqual(self.student.email, 'nuevo_email@jennifer.com')
 #comando para terminal y ver si funcionan test docker compose run --rm odoo -u university -d University_completa --test-enable --stop-after-init
