@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError  # Importante para que el error funcione
 
 class Grade(models.Model):
     # Nombre técnico del modelo y cómo queremos que se vea en los listados
@@ -37,6 +38,16 @@ class Grade(models.Model):
     # El campo de la nota numérica
     grade = fields.Float(string="Grade", required=True)
     
+    # Validación de nota
+    @api.constrains('grade')
+    def _check_grade_range(self):
+        for record in self:
+            if record.grade < 0 or record.grade > 10:
+                raise ValidationError(
+                    f"La nota de {record.student_id.name} ({record.grade}) no es válida. "
+                    "Debe estar entre 0.0 y 10.0."
+                )
+
     # Nombre que se mostrará en el sistema (ej. "Jennifer - PRO/2026/0001")
     display_name = fields.Char(compute="_compute_display_name", store=True)
 

@@ -12,7 +12,7 @@ class TestUniversity(TransactionCase):
             'name': 'Universidad de Jennifer'
         })
         
-        # 2. Creamos un Estudiante (Lo que ya tenías)
+        # 2. Creamos un Estudiante
         self.student = self.env['university.student'].create({
             'name': 'Jennifer Test',
             'university_id': self.uni.id,
@@ -32,23 +32,26 @@ class TestUniversity(TransactionCase):
 
     def test_02_enrollment_count(self):
         """TEST DE LÓGICA: ¿El contador de matrículas sube al matricular?"""
-        # Creamos una matrícula para el alumno
+        # AÑADIDO: university_id para cumplir con el NotNull
         self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
+            'university_id': self.uni.id,
         })
         
-        # Forzamos el recálculo del campo compute 'enrollment_count'
-        self.student._compute_enrollment_count()
+        # Forzamos el recálculo
+        self.student._compute_counts()
         
         # Verificamos que ahora el contador sea 1
         self.assertEqual(self.student.enrollment_count, 1, "El contador debería haber subido a 1")
 
     def test_03_grade_logic(self):
         """TEST DE NOTAS: ¿Se vinculan bien las calificaciones?"""
+        # AÑADIDO: university_id
         enrollment = self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
+            'university_id': self.uni.id,
         })
         
         # Creamos una nota
@@ -63,9 +66,11 @@ class TestUniversity(TransactionCase):
 
     def test_04_grade_security(self):
         """TEST DE SEGURIDAD: ¿Bloquea notas mayores a 10?"""
+        # AÑADIDO: university_id
         enrollment = self.env['university.enrollment'].create({
             'student_id': self.student.id,
             'subject_id': self.subject.id,
+            'university_id': self.uni.id,
         })
         
         # Intentamos crear una nota de 15.0 
