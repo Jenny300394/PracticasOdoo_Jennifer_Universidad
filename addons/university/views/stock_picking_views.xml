@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+ <record id="view_picking_form_inherit_notes" model="ir.ui.view">
+    <field name="name">stock.picking.form.inherit.notes</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//notebook" position="after">
+            <div class="mt-3" style="border-top: 1px solid #dee2e6; padding-top: 10px;">
+                <label for="x_notes" string="Notas del Pedido de Venta:" style="font-weight: bold; font-size: 15px;"/>
+                <field name="x_notes" class="w-100" readonly="1"/>
+            </div>
+        </xpath>
+    </field>
+</record>
+</odoo>

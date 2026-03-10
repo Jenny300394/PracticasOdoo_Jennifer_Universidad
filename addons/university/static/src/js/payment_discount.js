@@ -1,37 +1,33 @@
 /** @odoo-module **/
-
 import publicWidget from "@web/legacy/js/public/public_widget";
+import { jsonrpc } from "@web/core/network/rpc_service";
 
 publicWidget.registry.PaymentDiscount = publicWidget.Widget.extend({
-    selector: '#payment_method', 
+    // Usamos wrapwrap para que el JS se cargue en todas las páginas sin dar error
+    selector: '#wrapwrap', 
     events: {
-        'click input[name="o_payment_radio"]': '_onPaymentMethodClick',
+        'change .o_payment_option_card input[name="o_payment_radio"]': '_onPaymentMethodClick',
     },
 
     _onPaymentMethodClick: function (ev) {
-        const providerId = $(ev.currentTarget).data('provider-id') || $(ev.currentTarget).val();
+        // Obtenemos el ID del proveedor (Odoo 19 suele usar data-provider-id)
+        const $input = $(ev.currentTarget);
+        const providerId = $input.data('provider-id') || $input.val();
         
-        console.log("¡CLICK DETECTADO! Enviando ID:", providerId); 
+        if (!providerId) return;
 
-        // En lugar de usar rpc service, usamos el fetch nativo que nunca falla
-        // Enviamos la petición al controlador de Python que ya creamos
-        fetch('/shop/payment/update_discount', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                params: {
-                    provider_id: providerId,
-                }
-            }),
-        }).then(response => {
-            if (response.ok) {
-                console.log("Python ejecutado con éxito, recargando...");
+        console.log("¡Método de pago detectado!", providerId);
+
+        // Usamos jsonrpc que es la forma oficial de Odoo 19 (maneja tokens automáticamente)
+        jsonrpc('/shop/payment/update_discount', {
+            provider_id: parseInt(providerId),
+        }).then((data) => {
+            if (data.status === 'success') {
+                console.log("Descuento aplicado, recargando...");
                 window.location.reload();
             }
-        }).catch(error => {
-            console.error("Error en la conexión:", error);
+        }).catch((error) => {
+            console.error("Error al actualizar descuento:", error);
         });
     },
 });

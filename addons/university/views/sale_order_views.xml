@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record id="view_order_form_inherit_notes" model="ir.ui.view">
+    <field name="name">sale.order.form.inherit.notes</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='note']" position="after">
+            <div class="mt-3">
+                <label for="x_notes" style="font-weight: bold; font-size: 15px;"/>
+                <field name="x_notes" class="w-100" placeholder="Escribe aquí las notas del Ejercicio 12..."/>
+            </div>
+        </xpath>
+    </field>
+</record>
+</odoo>

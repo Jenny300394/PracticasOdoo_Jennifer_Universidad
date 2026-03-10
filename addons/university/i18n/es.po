@@ -324,4 +324,20 @@ msgstr "Profesor"
 msgid "Date"
 msgstr "Fecha"
 
+#. module: university
+#: model:ir.model.fields,field_description:university.field_university_grade__university_id
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_tree
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_form
+msgid "University"
+msgstr "Universidad"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_kanban
+msgid "University"
+msgstr "Universidad"
+
+#. module: university
+#: model_terms:ir.ui.view,arch_db:university.view_university_grade_kanban
+msgid "Calificación final"
+msgstr "Calificación final"
 

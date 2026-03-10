@@ -1,0 +1,15 @@
+POST http://localhost:8069/university/sync_product
+Content-Type: application/json
+X-Odoo-Database: University_completa
+
+{
+    "params": {
+        "name": "Producto Jennifer",
+        "type": "consu",
+        "description_sale": "Probando actividad 14",
+        "lst_price": 20.00,
+        "standard_price": 30.00,
+        "default_code": "PRODUCTO_DOS",
+        "token": "asdfghjklqwertyuiop"
+    }
+}
