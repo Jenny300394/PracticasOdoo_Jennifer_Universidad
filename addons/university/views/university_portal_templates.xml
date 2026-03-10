@@ -1,10 +1,7 @@
 <odoo>
-
-    <!-- Esta plantilla hereda el menú principal del portal y añade
-         un acceso directo a las calificaciones del estudiante -->
- <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
+    <template id="portal_my_home_menu_grades" inherit_id="portal.portal_my_home" priority="30">
         <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
-            <t t-if="grade_count">
+            <t t-if="grade_count is not False">
                 <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between" 
                    href="/my/grades" 
                    title="Grades">
@@ -12,31 +9,22 @@
                         <i class="fa fa-graduation-cap fa-2x fa-fw text-primary me-3"/>
                         <span>Calificaciones</span>
                     </div>
-                    <span class="badge rounded-pill text-bg-secondary" t-esc="grade_count"/>
-                </a>
+                    </a>
             </t>
         </xpath>
     </template>
 
-
-    <!-- Muestra una tabla con el historial académico del usuario -->
     <template id="portal_my_grades_list" name="My Grades">
-
-        <!-- Usamos el layout estándar del portal -->
         <t t-call="portal.portal_layout">
-
-            <!-- Activa la barra de búsqueda y breadcrumbs del portal -->
             <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
             <div class="container mt-3">
-
-                <!-- Título principal -->
                 <h3 class="mb-4">Academic Grades History</h3>
+                
+                <t t-if="not grades">
+                    <div class="alert alert-info">Aún no tienes calificaciones registradas.</div>
+                </t>
 
-                <!-- Tabla con las calificaciones -->
-                <table class="table table-hover bg-white o_portal_my_doc_table">
-
-                    <!-- Encabezados -->
+                <table t-if="grades" class="table table-hover bg-white o_portal_my_doc_table">
                     <thead>
                         <tr class="active">
                             <th>Subject</th>
@@ -45,45 +33,27 @@
                             <th class="text-center">Grade</th>
                         </tr>
                     </thead>
-
-                    <!-- Cuerpo de la tabla -->
                     <tbody>
-
-                        <!-- Recorremos cada calificación -->
                         <t t-foreach="grades" t-as="g">
                             <tr>
-
-                                <!-- Nombre de la asignatura -->
                                 <td>
-                                    <span t-if="g.enrollment_id"
-                                          t-field="g.enrollment_id.subject_id.name"/>
+                                    <span t-if="g.enrollment_id" t-out="g.enrollment_id.subject_id.name"/>
                                 </td>
-
-                                <!-- Profesor -->
                                 <td>
-                                    <span t-if="g.enrollment_id"
-                                          t-field="g.enrollment_id.professor_id.name"/>
+                                    <span t-if="g.enrollment_id" t-out="g.enrollment_id.professor_id.name"/>
                                 </td>
-
-                                <!-- Fecha de creación del registro -->
                                 <td>
-                                    <span t-field="g.create_date"
-                                          t-options='{"widget": "date"}'/>
+                                    <span t-field="g.create_date" t-options='{"widget": "date"}'/>
                                 </td>
-
-                                <!-- Nota con color verde si es aprobado, rojo si es suspenso-->
                                 <td class="text-center">
                                     <span t-attf-class="badge rounded-pill #{'text-bg-success' if g.grade >= 5 else 'text-bg-danger'}"
-                                          t-field="g.grade"/>
+                                          t-out="g.grade"/>
                                 </td>
-
                             </tr>
                         </t>
-
                     </tbody>
                 </table>
             </div>
         </t>
     </template>
-
 </odoo>

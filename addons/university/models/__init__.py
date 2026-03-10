@@ -9,3 +9,4 @@ from . import university_report
 from . import university_sale_order
 from . import payment_provider
 from . import stock_picking
+from . import res_partner
