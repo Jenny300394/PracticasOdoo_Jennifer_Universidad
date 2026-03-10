@@ -53,16 +53,17 @@ class UniversityWebsiteSale(http.Controller):
             # Enviamos el error real para que no rompa el JSON
             return {'status': 'error', 'message': str(e)}
 
-#Actividad 14
+# Actividad 14 corregida para Odoo 19
 
 class UniversityApi(http.Controller):
     
     @http.route('/university/sync_product', type='json', auth='none', methods=['POST'], csrf=False)
     def sync_product(self, **post):
-        # CAMBIO: Usamos 'post' directamente, es más seguro en Odoo 19
-        data = post 
+        # Odoo 19 extrae automáticamente los datos de 'params' en request.params
+        data = request.params
         token_recibido = data.get('token')
 
+        # 1. Validación de Token
         if token_recibido != "asdfghjklqwertyuiop":
             return {
                 "status": 401, 
@@ -70,20 +71,24 @@ class UniversityApi(http.Controller):
                 "message": "El token proporcionado no es válido."
             }
 
-        name = data.get('name')
+        # 2. CAMBIO CLAVE: Forzamos el entorno como Administrador (ID 2)
+        # Esto soluciona el error de "user_id" missing al cambiar precios
+        env = request.env(user=2) 
+        product_tmpl = env['product.template']
+        
         default_code = data.get('default_code')
 
+        # 3. Mapeo de campos (Cambiado a list_price)
         product_vals = {
-            'name': name,
+            'name': data.get('name'),
             'type': data.get('type', 'consu'),
             'description_sale': data.get('description_sale'),
-            'lst_price': data.get('lst_price', 0.0),
+            'list_price': data.get('lst_price', 0.0), 
             'standard_price': data.get('standard_price', 0.0),
             'default_code': default_code,
         }
 
-        # Buscamos y operamos con sudo()
-        product_tmpl = request.env['product.template'].sudo()
+        # 4. Buscar por referencia interna
         product = product_tmpl.search([('default_code', '=', default_code)], limit=1)
 
         if product:
