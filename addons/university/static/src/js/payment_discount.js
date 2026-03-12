@@ -1,33 +1,43 @@
 /** @odoo-module **/
 import publicWidget from "@web/legacy/js/public/public_widget";
-import { jsonrpc } from "@web/core/network/rpc_service";
+import { rpc } from "@web/core/network/rpc";
 
 publicWidget.registry.PaymentDiscount = publicWidget.Widget.extend({
-    // Usamos wrapwrap para que el JS se cargue en todas las páginas sin dar error
-    selector: '#wrapwrap', 
+    selector: '#payment_method', // Cambiamos el selector a uno más específico del área de pagos
     events: {
-        'change .o_payment_option_card input[name="o_payment_radio"]': '_onPaymentMethodClick',
+        'change input[name="o_payment_radio"]': '_onPaymentMethodClick',
     },
 
-    _onPaymentMethodClick: function (ev) {
-        // Obtenemos el ID del proveedor (Odoo 19 suele usar data-provider-id)
-        const $input = $(ev.currentTarget);
-        const providerId = $input.data('provider-id') || $input.val();
+    async _onPaymentMethodClick(ev) {
+        const input = ev.currentTarget;
         
-        if (!providerId) return;
+        // Intentamos obtener el ID del proveedor
+        let providerId = input.dataset.providerId || input.value;
 
-        console.log("¡Método de pago detectado!", providerId);
+        // Si el valor es "on" o no es un número, buscamos en el contenedor padre
+        if (!providerId || isNaN(parseInt(providerId))) {
+            const container = input.closest('div');
+            providerId = container ? container.dataset.providerId : null;
+        }
 
-        // Usamos jsonrpc que es la forma oficial de Odoo 19 (maneja tokens automáticamente)
-        jsonrpc('/shop/payment/update_discount', {
-            provider_id: parseInt(providerId),
-        }).then((data) => {
-            if (data.status === 'success') {
-                console.log("Descuento aplicado, recargando...");
+        if (!providerId || isNaN(parseInt(providerId))) {
+            return; 
+        }
+
+        console.log("Aplicando descuento para Provider ID:", providerId);
+
+        try {
+            const result = await rpc('/shop/payment/update_discount', {
+                provider_id: parseInt(providerId),
+            });
+
+            if (result && result.status === 'success') {
+                // Solo recargamos si el servidor confirma el cambio
+                // Esto evita el bucle de "conexión perdida"
                 window.location.reload();
             }
-        }).catch((error) => {
-            console.error("Error al actualizar descuento:", error);
-        });
+        } catch (error) {
+            console.error("Error en RPC de descuentos:", error);
+        }
     },
 });

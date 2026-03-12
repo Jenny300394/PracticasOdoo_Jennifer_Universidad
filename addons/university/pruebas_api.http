@@ -7,8 +7,8 @@ X-Odoo-Database: University_completa
         "name": "Producto nuevo",
         "type": "consu",
         "description_sale": "Probando actividad 14",
-        "lst_price": 20.00,
-        "standard_price": 30.00,
+        "lst_price": 10.00,
+        "standard_price": 20.00,
         "default_code": "PRODUCTO_CUATRO",
         "token": "asdfghjklqwertyuiop"
     }

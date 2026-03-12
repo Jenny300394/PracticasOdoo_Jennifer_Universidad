@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="total_discount_display_inherit" inherit_id="website_sale.total" name="Mostrar Descuento de Pago">
+        <xpath expr="//table//tr[last()]" position="before">
+            <t t-if="website_sale_order">
+                <t t-set="discount_lines" t-value="website_sale_order.order_line.filtered(lambda l: l.price_unit &lt; 0)"/>
+                
+                <t t-if="discount_lines">
+                    <t t-foreach="discount_lines" t-as="dis">
+                        <tr class="text-success fw-bold" style="background-color: rgba(40, 167, 69, 0.05);">
+                            <td class="text-start border-0 ps-3">
+                                <i class="fa fa-tag me-2"/> 
+                                <span t-esc="dis.name"/>
+                            </td>
+                            <td class="text-end border-0 pe-3">
+                                <span t-esc="dis.price_subtotal" t-options='{"widget": "monetary", "display_currency": website_sale_order.currency_id}'/>
+                            </td>
+                        </tr>
+                    </t>
+                </t>
+            </t>
+        </xpath>
+    </template>
+</odoo>

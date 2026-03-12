@@ -2,6 +2,7 @@ from odoo import http
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal
 
+# --- ACTIVIDADES ANTERIORES: UNIVERSIDAD Y PROFESORES ---
 class UniversityWebsite(http.Controller):
     @http.route(['/universidad'], type='http', auth="public", website=True)
     def list_universities(self, **post):
@@ -12,6 +13,7 @@ class UniversityWebsite(http.Controller):
     def list_professors(self, univ, **post):
         return request.render("university.professor_list_template", {'university': univ, 'professors': univ.professor_ids})
 
+# --- ACTIVIDAD 13: PORTAL DEL ESTUDIANTE ---
 class UniversityPortal(CustomerPortal):
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
@@ -23,62 +25,58 @@ class UniversityPortal(CustomerPortal):
             values['grade_count'] = request.env['university.grade'].sudo().search_count([('student_id', '=', student.id)])
         return values
 
-    # ESTA FUNCIÓN TIENE QUE ESTAR AQUÍ DENTRO (CON ESPACIOS A LA IZQUIERDA)
     @http.route(['/my/grades'], type='http', auth="user", website=True)
     def portal_my_grades(self, **kw):
         student = request.env['university.student'].sudo().search([('partner_id', '=', request.env.user.partner_id.id)], limit=1)
         grades = request.env['university.grade'].sudo().search([('student_id', '=', student.id)]) if student else []
-        
-        # Usamos portal_my_grades_list que es el ID que pusiste en tu XML
         return request.render("university.portal_my_grades_list", {
             'grades': grades, 
             'page_name': 'grades'
         })
 
+# --- ACTIVIDAD 11: DESCUENTO POR PAGO ---
 class UniversityWebsiteSale(http.Controller):
-    # Añadimos csrf=False aquí abajo
-    @http.route(['/shop/payment/update_discount'], type='json', auth="public", website=True, csrf=False)
-    def update_payment_discount(self, provider_id=None, **post):
-        order = request.website.sale_get_order()
-        if not order:
-            return {'status': 'error', 'message': 'Pedido no encontrado'}
+    @http.route('/shop/payment/update_discount', type='json', auth="public", website=True, csrf=False)
+    def update_discount(self, provider_id, **kwargs):
+        # Log para ver si llega la llamada al terminal de Docker
+        print(f">>> RECIBIDA LLAMADA PARA PROVIDER: {provider_id}")
+        
+        if not provider_id:
+            return {'status': 'error', 'message': 'ID no recibido'}
+
+        # CORRECCIÓN AQUÍ: Obtenemos el pedido desde la sesión de forma segura
+        sale_order_id = request.session.get('sale_order_id')
+        if not sale_order_id:
+            return {'status': 'error', 'message': 'No hay pedido activo en la sesión'}
+
+        order = request.env['sale.order'].sudo().browse(sale_order_id)
+        if not order.exists():
+            return {'status': 'error', 'message': 'El pedido no existe'}
 
         try:
-            # Importante: provider_id suele llegar como entero desde el radio button
-            if provider_id:
-                order.sudo()._update_payment_discount(provider_id)
-                return {'status': 'success'} 
-            return {'status': 'error', 'message': 'ID de proveedor no válido'}
+            # Llamamos a tu método en el modelo sale.order
+            success = order._update_payment_discount(int(provider_id))
+            return {'status': 'success' if success else 'error'}
         except Exception as e:
-            # Enviamos el error real para que no rompa el JSON
+            print(f"ERROR CRÍTICO EN PYTHON: {str(e)}")
             return {'status': 'error', 'message': str(e)}
 
-# Actividad 14 corregida para Odoo 19
-
+# --- ACTIVIDAD 14: API DE SINCRONIZACIÓN (CORRECCIÓN FINAL) ---
 class UniversityApi(http.Controller):
-    
     @http.route('/university/sync_product', type='json', auth='none', methods=['POST'], csrf=False)
     def sync_product(self, **post):
-        # Odoo 19 extrae automáticamente los datos de 'params' en request.params
         data = request.params
         token_recibido = data.get('token')
-
-        # 1. Validación de Token
         if token_recibido != "asdfghjklqwertyuiop":
-            return {
-                "status": 401, 
-                "error": "No autorizado",
-                "message": "El token proporcionado no es válido."
-            }
+            return {"status": 401, "error": "No autorizado"}
 
-        # 2. CAMBIO CLAVE: Forzamos el entorno como Administrador (ID 2)
-        # Esto soluciona el error de "user_id" missing al cambiar precios
+        # Dejamos tu env como estaba, que ya sabemos que te funciona
         env = request.env(user=2) 
-        product_tmpl = env['product.template']
         
+        # EL CAMBIO ES AQUÍ: Aplicamos el contexto al modelo, no al env
+        product_tmpl = env['product.template'].with_context(company_id=1, force_company=1)
         default_code = data.get('default_code')
 
-        # 3. Mapeo de campos (Cambiado a list_price)
         product_vals = {
             'name': data.get('name'),
             'type': data.get('type', 'consu'),
@@ -86,14 +84,14 @@ class UniversityApi(http.Controller):
             'list_price': data.get('lst_price', 0.0), 
             'standard_price': data.get('standard_price', 0.0),
             'default_code': default_code,
+            'company_id': 1, # Aseguramos que el producto sepa que es de la empresa 1
         }
 
-        # 4. Buscar por referencia interna
         product = product_tmpl.search([('default_code', '=', default_code)], limit=1)
-
         if product:
-            product.write(product_vals)
-            return {"status": 200, "message": "Producto actualizado con éxito"}
+            # Aquí también aseguramos que al escribir use el contexto de la empresa
+            product.with_context(company_id=1, force_company=1).write(product_vals)
+            return {"status": 200, "message": "Producto actualizado"}
         else:
             product_tmpl.create(product_vals)
-            return {"status": 201, "message": "Producto creado con éxito"}
+            return {"status": 201, "message": "Producto creado"}
