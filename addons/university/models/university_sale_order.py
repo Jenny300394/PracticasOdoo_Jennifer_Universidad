@@ -6,41 +6,36 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    # Actividad 12
+    # Actividad 12: Campo en Pedido de Venta
     x_notes = fields.Text(string="Notas del Ejercicio 12")
+
+    # ESTA ES LA CLAVE: Sincroniza el cambio hacia el Albarán si lo modificas después
+    def write(self, vals):
+        res = super(SaleOrder, self).write(vals)
+        if 'x_notes' in vals:
+            for order in self:
+                # Si el pedido ya tiene albaranes, les actualizamos la nota también
+                if order.picking_ids:
+                    order.picking_ids.write({'x_notes': vals['x_notes']})
+        return res
 
     def _update_payment_discount(self, provider_id):
         self = self.sudo()
         self.ensure_one()
-        
         if not provider_id:
             return False
 
         try:
             provider = self.env['payment.provider'].browse(int(provider_id))
-            if not provider.exists():
-                return False
-
             discount_product = provider.discount_product_id
             
-            # 1. LIMPIEZA ANTIDUPLICADOS (Por Producto)
-            # Buscamos cualquier línea que use el producto de descuento, sea cual sea su precio
-            if discount_product:
-                lines_to_remove = self.order_line.filtered(lambda l: l.product_id.id == discount_product.id)
-                if lines_to_remove:
-                    lines_to_remove.unlink()
-            
-            # También limpiamos por si hay líneas negativas de otros intentos
-            old_negative_lines = self.order_line.filtered(lambda l: l.price_unit < 0)
-            if old_negative_lines:
-                old_negative_lines.unlink()
+            # 1. LIMPIEZA
+            self.order_line.filtered(lambda l: l.product_id.id == discount_product.id or l.price_unit < 0).unlink()
 
             if not discount_product:
-                _logger.warning("El proveedor no tiene configurado un producto de descuento.")
                 return True
 
-            # 2. CÁLCULO ROBUSTO
-            # Si amount_untaxed es 0.0 (error común de sesión), sumamos las líneas actuales
+            # 2. CÁLCULO
             base_calculo = self.amount_untaxed
             if base_calculo <= 0:
                 base_calculo = sum(line.price_subtotal for line in self.order_line)
@@ -63,16 +58,18 @@ class SaleOrder(models.Model):
                     'sequence': 999,
                 })
             
-            # 4. ACTUALIZAR NOTAS (Actividad 12)
-            self.write({
-                'x_notes': f"Aplicado descuento de {abs(round(amount, 2))}€ usando {provider.name}"
-            })
-            
-            # En Odoo 19, al hacer unlink() y create(), el sistema recalcula 
-            # el total al final de la transacción automáticamente.
             return True
-
         except Exception as e:
-            _logger.error("--- ERROR EN university_sale_order.py ---")
             _logger.error(str(e))
             return False
+
+    # Asegura que al confirmar por primera vez, se lleve la nota que haya
+    def _prepare_picking(self):
+        res = super(SaleOrder, self)._prepare_picking()
+        res['x_notes'] = self.x_notes
+        return res
+
+class StockPicking(models.Model):
+    _inherit = 'stock.picking'
+
+    x_notes = fields.Text(string="Notas del Ejercicio 12")
